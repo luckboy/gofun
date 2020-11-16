@@ -26,20 +26,38 @@ type Monad interface {
     Bind(func(interface{}) Monad) Monad
 }
 
+func MonadOrElse(x interface{}, y Monad) Monad {
+    z, isOk := x.(Monad)
+    if isOk {
+        return z
+    } else {
+        return y
+    }
+}
+
+func MonadOrElseNil(x interface{}) Monad {
+    z, isOk := x.(Monad)
+    if isOk {
+        return z
+    } else {
+        return nil
+    }
+}
+
 func Join(m Monad) Monad {
     return m.Bind(func(x interface{}) Monad {
-            y, isOk := x.(Monad)
-            if isOk {
-                return y
-            } else {
-                return nil
-            }
+            return MonadOrElseNil(x)
     })
 }
 
 func (m *Option) Bind(f func(interface{}) Monad) Monad {
     if m.IsSome() {
-        return f(m.Get())
+        m2 := f(m.Get())
+        if m2 != nil {
+            return m2
+        } else {
+            return None()
+        }
     } else {
         return None()
     }
@@ -47,7 +65,12 @@ func (m *Option) Bind(f func(interface{}) Monad) Monad {
 
 func (m *Either) Bind(f func(interface{}) Monad) Monad {
     if m.IsRight() {
-        return f(m.GetRight())
+        m2 := f(m.GetRight())
+        if m2 != nil {
+            return m2
+        } else {
+            return Left(nil)
+        }
     } else {
         return Left(m.GetLeft())
     }

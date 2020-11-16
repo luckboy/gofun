@@ -26,6 +26,24 @@ type Functor interface {
     Map(func(interface{}) interface{}) Functor
 }
 
+func FunctorOrElse(x interface{}, y Functor) Functor {
+    z, isOk := x.(Functor)
+    if isOk {
+        return z
+    } else {
+        return y
+    }
+}
+
+func FunctorOrElseNil(x interface{}) Functor {
+    z, isOk := x.(Functor)
+    if isOk {
+        return z
+    } else {
+        return nil
+    }
+}
+
 func (xs *Option) Map(f func(interface{}) interface{}) Functor {
     if xs.IsSome() {
         return Some(f(xs.Get()))
