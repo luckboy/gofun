@@ -26,6 +26,17 @@ type Monad interface {
     Bind(func(interface{}) Monad) Monad
 }
 
+func Join(m Monad) Monad {
+    return m.Bind(func(x interface{}) Monad {
+            y, isOk := x.(Monad)
+            if isOk {
+                return y
+            } else {
+                return nil
+            }
+    })
+}
+
 func (m *Option) Bind(f func(interface{}) Monad) Monad {
     if m.IsSome() {
         return f(m.Get())
@@ -45,8 +56,8 @@ func (m *Either) Bind(f func(interface{}) Monad) Monad {
 func (m InterfaceSlice) Bind(f func(interface{}) Monad) Monad {
     ys := make([]interface{}, 0, len(m))
     for _, x := range m {
-        m2, ok := f(x).(InterfaceSlice)
-        if ok {
+        m2, isOk := f(x).(InterfaceSlice)
+        if isOk {
             for _, y := range m2 {
                 ys = append(ys, y)
             }
