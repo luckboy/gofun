@@ -35,8 +35,8 @@ func Right(x interface{}) *Either {
     return &Either { isRight: true, x: x }
 }
 
-func (o *Either) IsRight() bool {
-    return o.isRight
+func (e *Either) IsRight() bool {
+    return e.isRight
 }
 
 func (e *Either) GetLeft() interface{} {
