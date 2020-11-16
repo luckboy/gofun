@@ -23,6 +23,7 @@
 package gofun
 
 type Monad interface {
+    Functor
     Bind(func(interface{}) Monad) Monad
 }
 
