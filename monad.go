@@ -82,8 +82,10 @@ func (m InterfaceSlice) Bind(f func(interface{}) Monad) Monad {
     for _, x := range m {
         m2, isOk := f(x).(InterfaceSlice)
         if isOk {
-            for _, y := range m2 {
-                ys = append(ys, y)
+            if m2 != nil {
+                for _, y := range m2 {
+                    ys = append(ys, y)
+                }
             }
         }
     }
