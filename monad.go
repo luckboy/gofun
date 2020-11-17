@@ -77,6 +77,28 @@ func (m *Either) Bind(f func(interface{}) Monad) Monad {
     }
 }
 
+func (m *List) Bind(f func(interface{}) Monad) Monad {
+    var ys *List = Nil()
+    var prev *List = nil
+    for l := m; l.IsCons(); l = l.Tail() {
+        zs, isOk := f(l.Head()).(*List)
+        if isOk {
+            if zs != nil {
+                for l2 := zs; l.IsCons(); l2 = l2.Tail() {
+                    l3 := Cons(l2.Head(), Nil())
+                    if prev != nil {
+                        prev.SetTail(l3)
+                    } else {
+                        ys = l3
+                    }
+                    prev = l3
+                }
+            }
+        }
+    }
+    return ys
+}
+
 func (m InterfaceSlice) Bind(f func(interface{}) Monad) Monad {
     ys := make([]interface{}, 0, len(m))
     for _, x := range m {

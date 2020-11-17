@@ -60,6 +60,21 @@ func (xs *Either) Map(f func(interface{}) interface{}) Functor {
     }
 }
 
+func (xs *List) Map(f func(interface{}) interface{}) Functor {
+    var ys *List = Nil()
+    var prev *List = nil
+    for l := xs; l.IsCons(); l = l.Tail() {
+        l2 := Cons(f(l.Head()), Nil())
+        if prev != nil {
+            prev.SetTail(l2)
+        } else {
+            ys = l2
+        }
+        prev = l2
+    }
+    return ys
+}
+
 func (xs InterfaceSlice) Map(f func(interface{}) interface{}) Functor {
     ys := make([]interface{}, 0, len(xs))
     for _, x := range xs {
