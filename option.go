@@ -35,6 +35,10 @@ func Some(x interface{}) *Option {
     return &Option { isSome: true, x: x }
 }
 
+func (o *Option) IsNone() bool {
+    return !o.isSome
+}
+
 func (o *Option) IsSome() bool {
     return o.isSome
 }
