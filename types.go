@@ -22,4 +22,7 @@
 
 package gofun
 
-type InterfaceSlice []interface{}
+type (
+    InterfaceSlice []interface{}
+    InterfacePairMap map[interface{}]interface{}
+)
