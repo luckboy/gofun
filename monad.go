@@ -89,3 +89,18 @@ func (m InterfaceSlice) Bind(f func(interface{}) Monad) Monad {
     }
     return InterfaceSlice(ys)
 }
+
+func (m InterfacePairMap) Bind(f func(interface{}) Monad) Monad {
+    ys := make(map[interface{}]interface{}, len(m))
+    for k, v := range m {
+        m2, isOk := f(NewPair(k, v)).(InterfacePairMap)
+        if isOk {
+            if m2 != nil {
+                for k2, v2 := range m2 {
+                    ys[k2] = v2
+                }
+            }
+        }
+    }
+    return InterfacePairMap(ys)
+}

@@ -67,3 +67,14 @@ func (xs InterfaceSlice) Map(f func(interface{}) interface{}) Functor {
     }
     return InterfaceSlice(ys)
 }
+
+func (xs InterfacePairMap) Map(f func(interface{}) interface{}) Functor {
+    ys := make(map[interface{}]interface{}, len(xs))
+    for k, v := range xs {
+        p, isOk := f(NewPair(k, v)).(*Pair)
+        if isOk {
+            ys[p.First] = p.Second
+        }
+    }
+    return InterfacePairMap(ys)
+}
