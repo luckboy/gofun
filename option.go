@@ -27,6 +27,15 @@ type Option struct {
     x interface{}
 }
 
+func OptionOrElse(x interface{}, y *Option) *Option {
+    z, isOk := x.(*Option)
+    if isOk {
+        return z
+    } else {
+        return y
+    }
+}
+
 func None() *Option {
     return &Option { isSome: false, x: nil } 
 }

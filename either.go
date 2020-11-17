@@ -27,6 +27,16 @@ type Either struct {
     x interface{}
 }
 
+func EitherOrElse(x interface{}, y *Either) *Either {
+    z, isOk := x.(*Either)
+    if isOk {
+        return z
+    } else {
+        return y
+    }
+}
+
+
 func Left(x interface{}) *Either {
     return &Either { isRight: false, x: x }
 }

@@ -28,6 +28,15 @@ type List struct {
     tail *List
 }
 
+func ListOrElse(x interface{}, y *List) *List {
+    z, isOk := x.(*List)
+    if isOk {
+        return z
+    } else {
+        return y
+    }
+}
+
 func Nil() *List {
     return &List { isCons: false, head: nil, tail: nil }
 }
