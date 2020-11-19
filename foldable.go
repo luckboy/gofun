@@ -51,10 +51,26 @@ func All(f func(interface{}) bool, xs Foldable) bool {
     }, true), false)
 }
 
+func AllM(f func(interface{}) Monad, xs Foldable, u func(interface{}) Monad) Monad {
+    return FoldLeftM(func(x interface{}, y interface{}) Monad {
+            return MonadOrElseNil(f(y).Map(func(y2 interface{}) interface{} {
+                    return BoolOrElse(x, false) && BoolOrElse(y2, false)
+            }))
+    }, true, xs, u)
+}
+
 func Any(f func(interface{}) bool, xs Foldable) bool {
     return BoolOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
             return BoolOrElse(x, false) || f(y)
     }, false), false)
+}
+
+func AnyM(f func(interface{}) Monad, xs Foldable, u func(interface{}) Monad) Monad {
+    return FoldLeftM(func(x interface{}, y interface{}) Monad {
+            return MonadOrElseNil(f(y).Map(func(y2 interface{}) interface{} {
+                    return BoolOrElse(x, false) || BoolOrElse(y2, false)
+            }))
+    }, false, xs, u)
 }
 
 func Element(x interface{}, xs Foldable) bool {
@@ -76,6 +92,42 @@ func Find(f func(interface{}) bool, xs Foldable) *Option {
                 }
             }
     }, None()), None())
+}
+
+func FoldLeftM(f func(interface{}, interface{}) Monad, z interface{}, xs Foldable, u func(interface{}) Monad) Monad {
+    g, isOk := xs.FoldRight(func(y, x interface{}) interface{} {
+        return func(x2 interface{}) Monad {
+            h, isOk2 := x.(func(interface{}) Monad)
+            if isOk2 {
+                return f(x2, y).Bind(h)
+            } else {
+                return nil
+            }
+        }
+    }, u).(func(interface{}) Monad)
+    if isOk {
+        return g(z)
+    } else {
+        return nil
+    }
+}
+
+func FoldRightM(f func(interface{}, interface{}) Monad, z interface{}, xs Foldable, u func(interface{}) Monad) Monad {
+    g, isOk := xs.FoldLeft(func(x, y interface{}) interface{} {
+        return func(x2 interface{}) Monad {
+            h, isOk2 := x.(func(interface{}) Monad)
+            if isOk2 {
+                return f(y, x2).Bind(h)
+            } else {
+                return nil
+            }
+        }
+    }, u).(func(interface{}) Monad)
+    if isOk {
+        return g(z)
+    } else {
+        return nil
+    }
 }
 
 func NotElement(x interface{}, xs Foldable) bool {
