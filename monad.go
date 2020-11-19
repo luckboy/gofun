@@ -128,3 +128,18 @@ func (m InterfacePairMap) Bind(f func(interface{}) Monad) Monad {
     }
     return InterfacePairMap(ys)
 }
+
+func (m InterfacePairFunction) Bind(f func(interface{}) Monad) Monad {
+    return InterfacePairFunction(func(x interface{}) interface{} {
+            g, isOk := f(m(x)).(InterfacePairFunction)
+            if isOk {
+                if g != nil {
+                    return g(x)
+                } else {
+                    return x
+                }
+            } else {
+                return x
+            }
+    })
+}

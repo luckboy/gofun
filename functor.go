@@ -93,3 +93,9 @@ func (xs InterfacePairMap) Map(f func(interface{}) interface{}) Functor {
     }
     return InterfacePairMap(ys)
 }
+
+func (xs InterfacePairFunction) Map(f func(interface{}) interface{}) Functor {
+    return InterfacePairFunction(func(x interface {}) interface{} {
+        return f(xs(x))
+    })
+}

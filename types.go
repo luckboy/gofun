@@ -25,4 +25,5 @@ package gofun
 type (
     InterfaceSlice []interface{}
     InterfacePairMap map[interface{}]interface{}
+    InterfacePairFunction func(interface{}) interface{}
 )
