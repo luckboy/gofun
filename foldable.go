@@ -45,19 +45,19 @@ func FoldableOrElseNil(x interface{}) Foldable {
     }
 }
 
-func Any(f func(interface{}) bool, xs Foldable) bool {
-    return BoolOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
-            return BoolOrElse(x, false) || f(y)
-    }, false), false)
-}
-
 func All(f func(interface{}) bool, xs Foldable) bool {
     return BoolOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
             return BoolOrElse(x, false) && f(y)
     }, true), false)
 }
 
-func Elem(x interface{}, xs Foldable) bool {
+func Any(f func(interface{}) bool, xs Foldable) bool {
+    return BoolOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
+            return BoolOrElse(x, false) || f(y)
+    }, false), false)
+}
+
+func Element(x interface{}, xs Foldable) bool {
     return BoolOrElse(xs.FoldLeft(func(y, z interface{}) interface{} {
             return BoolOrElse(y, false) || z == x
     }, false), false)
@@ -78,8 +78,8 @@ func Find(f func(interface{}) bool, xs Foldable) *Option {
     }, None()), None())
 }
 
-func NotElem(x interface{}, xs Foldable) bool {
-    return !Elem(x, xs)
+func NotElement(x interface{}, xs Foldable) bool {
+    return !Element(x, xs)
 }
 
 func Length(xs Foldable) int {
