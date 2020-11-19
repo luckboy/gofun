@@ -36,15 +36,6 @@ func FoldableOrElse(x interface{}, y Foldable) Foldable {
     }
 }
 
-func FoldableOrElseNil(x interface{}) Foldable {
-    z, isOk := x.(Foldable)
-    if isOk {
-        return z
-    } else {
-        return nil
-    }
-}
-
 func All(f func(interface{}) bool, xs Foldable) bool {
     return BoolOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
             return BoolOrElse(x, false) && f(y)
@@ -101,14 +92,14 @@ func FoldLeftM(f func(interface{}, interface{}) Monad, z interface{}, xs Foldabl
             if isOk2 {
                 return f(x2, y).Bind(h)
             } else {
-                return nil
+                return u(x2)
             }
         }
     }, u).(func(interface{}) Monad)
     if isOk {
         return g(z)
     } else {
-        return nil
+        return u(z)
     }
 }
 
@@ -119,14 +110,14 @@ func FoldRightM(f func(interface{}, interface{}) Monad, z interface{}, xs Foldab
             if isOk2 {
                 return f(y, x2).Bind(h)
             } else {
-                return nil
+                return u(x2)
             }
         }
     }, u).(func(interface{}) Monad)
     if isOk {
         return g(z)
     } else {
-        return nil
+        return u(z)
     }
 }
 

@@ -36,15 +36,6 @@ func MonadOrElse(x interface{}, y Monad) Monad {
     }
 }
 
-func MonadOrElseNil(x interface{}) Monad {
-    z, isOk := x.(Monad)
-    if isOk {
-        return z
-    } else {
-        return nil
-    }
-}
-
 func IfM(cond Monad, ifTrue, ifFalse func() Monad) Monad {
     return cond.Bind(func(x interface{}) Monad {
             if BoolOrElse(x, false) {
@@ -55,9 +46,9 @@ func IfM(cond Monad, ifTrue, ifFalse func() Monad) Monad {
     });
 }
 
-func Join(m Monad) Monad {
+func Join(m Monad, f Monad) Monad {
     return m.Bind(func(x interface{}) Monad {
-            return MonadOrElseNil(x)
+            return MonadOrElse(x, f)
     })
 }
 
@@ -87,12 +78,7 @@ func WhileM(cond Monad, body func() Monad, u func(interface{}) Monad) Monad {
 
 func (m *Option) Bind(f func(interface{}) Monad) Monad {
     if m.IsSome() {
-        m2 := f(m.Get())
-        if m2 != nil {
-            return m2
-        } else {
-            return None()
-        }
+        return f(m.Get())
     } else {
         return None()
     }
@@ -104,12 +90,7 @@ func OptionUnit(x interface{}) Monad {
 
 func (m *Either) Bind(f func(interface{}) Monad) Monad {
     if m.IsRight() {
-        m2 := f(m.GetRight())
-        if m2 != nil {
-            return m2
-        } else {
-            return Left(nil)
-        }
+        return f(m.GetRight())
     } else {
         return Left(m.GetLeft())
     }
@@ -125,16 +106,14 @@ func (m *List) Bind(f func(interface{}) Monad) Monad {
     for l := m; l.IsCons(); l = l.Tail() {
         zs, isOk := f(l.Head()).(*List)
         if isOk {
-            if zs != nil {
-                for l2 := zs; l.IsCons(); l2 = l2.Tail() {
-                    l3 := Cons(l2.Head(), Nil())
-                    if prev != nil {
-                        prev.SetTail(l3)
-                    } else {
-                        ys = l3
-                    }
-                    prev = l3
+            for l2 := zs; l.IsCons(); l2 = l2.Tail() {
+                l3 := Cons(l2.Head(), Nil())
+                if prev != nil {
+                    prev.SetTail(l3)
+                } else {
+                    ys = l3
                 }
+                prev = l3
             }
         }
     }
@@ -150,10 +129,8 @@ func (m InterfaceSlice) Bind(f func(interface{}) Monad) Monad {
     for _, x := range m {
         m2, isOk := f(x).(InterfaceSlice)
         if isOk {
-            if m2 != nil {
-                for _, y := range m2 {
-                    ys = append(ys, y)
-                }
+            for _, y := range m2 {
+                ys = append(ys, y)
             }
         }
     }
@@ -169,10 +146,8 @@ func (m InterfacePairMap) Bind(f func(interface{}) Monad) Monad {
     for k, v := range m {
         m2, isOk := f(NewPair(k, v)).(InterfacePairMap)
         if isOk {
-            if m2 != nil {
-                for k2, v2 := range m2 {
-                    ys[k2] = v2
-                }
+            for k2, v2 := range m2 {
+                ys[k2] = v2
             }
         }
     }
@@ -192,11 +167,7 @@ func (m InterfacePairFunction) Bind(f func(interface{}) Monad) Monad {
     return InterfacePairFunction(func(x interface{}) interface{} {
             g, isOk := f(m(x)).(InterfacePairFunction)
             if isOk {
-                if g != nil {
-                    return g(x)
-                } else {
-                    return x
-                }
+                return g(x)
             } else {
                 return x
             }
