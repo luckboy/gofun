@@ -64,6 +64,10 @@ func (m *Option) Bind(f func(interface{}) Monad) Monad {
     }
 }
 
+func OptionUnit(x interface{}) Monad {
+    return Some(x)
+}
+
 func (m *Either) Bind(f func(interface{}) Monad) Monad {
     if m.IsRight() {
         m2 := f(m.GetRight())
@@ -75,6 +79,10 @@ func (m *Either) Bind(f func(interface{}) Monad) Monad {
     } else {
         return Left(m.GetLeft())
     }
+}
+
+func EitherUnit(x interface{}) Monad {
+    return Right(x)
 }
 
 func (m *List) Bind(f func(interface{}) Monad) Monad {
@@ -99,6 +107,10 @@ func (m *List) Bind(f func(interface{}) Monad) Monad {
     return ys
 }
 
+func ListUnit(x interface{}) Monad {
+    return Cons(x, Nil())
+}
+
 func (m InterfaceSlice) Bind(f func(interface{}) Monad) Monad {
     ys := make([]interface{}, 0, len(m))
     for _, x := range m {
@@ -112,6 +124,10 @@ func (m InterfaceSlice) Bind(f func(interface{}) Monad) Monad {
         }
     }
     return InterfaceSlice(ys)
+}
+
+func InterfaceSliceUnit(x interface{}) Monad {
+    return InterfaceSlice([]interface{} { x })
 }
 
 func (m InterfacePairMap) Bind(f func(interface{}) Monad) Monad {
@@ -129,6 +145,15 @@ func (m InterfacePairMap) Bind(f func(interface{}) Monad) Monad {
     return InterfacePairMap(ys)
 }
 
+func InterfacePairMapUnit(x interface{}) Monad {
+    p, isOk := x.(*Pair)
+    if isOk {
+        return InterfacePairMap(map[interface{}]interface{} { p.First : p.Second })
+    } else {
+        return nil
+    }
+}
+
 func (m InterfacePairFunction) Bind(f func(interface{}) Monad) Monad {
     return InterfacePairFunction(func(x interface{}) interface{} {
             g, isOk := f(m(x)).(InterfacePairFunction)
@@ -141,5 +166,11 @@ func (m InterfacePairFunction) Bind(f func(interface{}) Monad) Monad {
             } else {
                 return x
             }
+    })
+}
+
+func InterfacePairFunctionUnit(x interface{}) Monad {
+    return InterfacePairFunction(func(y interface{}) interface{} {
+            return x
     })
 }
