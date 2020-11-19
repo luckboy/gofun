@@ -53,9 +53,9 @@ func All(f func(interface{}) bool, xs Foldable) bool {
 
 func AllM(f func(interface{}) Monad, xs Foldable, u func(interface{}) Monad) Monad {
     return FoldLeftM(func(x interface{}, y interface{}) Monad {
-            return MonadOrElseNil(f(y).Map(func(y2 interface{}) interface{} {
+            return MonadOrElse(f(y).Map(func(y2 interface{}) interface{} {
                     return BoolOrElse(x, false) && BoolOrElse(y2, false)
-            }))
+            }), u(false))
     }, true, xs, u)
 }
 
@@ -67,9 +67,9 @@ func Any(f func(interface{}) bool, xs Foldable) bool {
 
 func AnyM(f func(interface{}) Monad, xs Foldable, u func(interface{}) Monad) Monad {
     return FoldLeftM(func(x interface{}, y interface{}) Monad {
-            return MonadOrElseNil(f(y).Map(func(y2 interface{}) interface{} {
+            return MonadOrElse(f(y).Map(func(y2 interface{}) interface{} {
                     return BoolOrElse(x, false) || BoolOrElse(y2, false)
-            }))
+            }), u(false))
     }, false, xs, u)
 }
 
