@@ -45,9 +45,43 @@ func MonadOrElseNil(x interface{}) Monad {
     }
 }
 
+func IfM(cond Monad, ifTrue, ifFalse func() Monad) Monad {
+    return cond.Bind(func(x interface{}) Monad {
+            if BoolOrElse(x, false) {
+                return ifTrue()
+            } else {
+                return ifFalse()
+            }
+    });
+}
+
 func Join(m Monad) Monad {
     return m.Bind(func(x interface{}) Monad {
             return MonadOrElseNil(x)
+    })
+}
+
+func UntilM(m Monad, cond func() Monad, u func(interface{}) Monad) Monad {
+    return m.Bind(func(x interface{}) Monad {
+            return cond().Bind(func(y interface{}) Monad {
+                    if !BoolOrElse(x, false) {
+                        return UntilM(m, cond, u)
+                    } else {
+                        return u(struct{} {})
+                    }
+            })
+    })
+}
+
+func WhileM(cond Monad, body func() Monad, u func(interface{}) Monad) Monad {
+    return cond.Bind(func(x interface{}) Monad {
+            if BoolOrElse(x, false) {
+                return body().Bind(func(y interface{}) Monad {
+                        return WhileM(cond, body, u)
+                })
+            } else {
+                return u(struct{}{})
+            }
     })
 }
 
