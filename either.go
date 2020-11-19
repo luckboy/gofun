@@ -69,34 +69,34 @@ func (e *Either) GetRight() interface{} {
     }
 }
 
-func (e *Either) GetLeftOrElse(x interface{}) interface{} {
+func (e *Either) GetLeftOrElse(x func() interface{}) interface{} {
     if e.isRight {
-        return x
+        return x()
     } else {
         return e.x
     }
 }
 
-func (e *Either) LeftOrElse(e2 *Either) interface{} {
+func (e *Either) LeftOrElse(e2 func() *Either) interface{} {
     if e.isRight {
-        return e2
+        return e2()
     } else {
         return e
     }
 }
 
-func (e *Either) GetRightOrElse(x interface{}) interface{} {
+func (e *Either) GetRightOrElse(x func() interface{}) interface{} {
     if e.isRight {
         return e.x
     } else {
-        return x
+        return x()
     }
 }
 
-func (e *Either) RightOrElse(e2 *Either) interface{} {
+func (e *Either) RightOrElse(e2 func() *Either) interface{} {
     if e.isRight {
         return e
     } else {
-        return e2
+        return e2()
     }
 }

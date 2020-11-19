@@ -56,18 +56,18 @@ func (o *Option) Get() interface{} {
     return o.x
 }
 
-func (o *Option) GetOrElse(x interface{}) interface{} {
+func (o *Option) GetOrElse(x func() interface{}) interface{} {
     if o.isSome {
         return o.x
     } else {
-        return x
+        return x()
     }
 }
 
-func (o *Option) OrElse(o2 *Option) *Option {
+func (o *Option) OrElse(o2 func() *Option) *Option {
     if o.isSome {
         return o
     } else {
-        return o2
+        return o2()
     }
 }
