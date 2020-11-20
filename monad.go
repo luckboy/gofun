@@ -124,6 +124,24 @@ func ListUnit(x interface{}) Monad {
     return Cons(x, Nil())
 }
 
+func (m ST) Bind(f func(interface{}) Monad) Monad {
+    return ST(func(s interface{}) (interface{}, interface{}) {
+            s2, x := m(s)
+            m2, isOk := f(x).(ST)
+            if isOk {
+                return m2(s2)
+            } else {
+                return s2, x
+            }
+    })
+}
+
+func STUnit(x interface{}) Monad {
+    return ST(func(s interface{}) (interface{}, interface{}) {
+            return s, x
+    })
+}
+
 func (m InterfaceSlice) Bind(f func(interface{}) Monad) Monad {
     ys := make([]interface{}, 0, len(m))
     for _, x := range m {

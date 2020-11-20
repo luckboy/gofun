@@ -66,6 +66,13 @@ func (xs *List) Map(f func(interface{}) interface{}) Functor {
     return ys
 }
 
+func (xs ST) Map(f func(interface{}) interface{}) Functor {
+    return ST(func(s interface{}) (interface{}, interface{}) {
+            s2, x := xs(s)
+            return s2, f(x)
+    })
+}
+
 func (xs InterfaceSlice) Map(f func(interface{}) interface{}) Functor {
     ys := make([]interface{}, 0, len(xs))
     for _, x := range xs {
