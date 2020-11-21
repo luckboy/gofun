@@ -93,10 +93,10 @@ func TestMapMethodMapsST(t *testing.T) {
     } else {
         s, x := RunST(ys, 1)
         if !reflect.DeepEqual(s, 1) {
-            t.Errorf("Map method first result is %v; want %v", s, 1)
+            t.Errorf("RunST function first result from Map method result is %v; want %v", s, 1)
         }
         if !reflect.DeepEqual(x, 4) {
-            t.Errorf("Map method second result is %v; want %v", x, 4)
+            t.Errorf("RunST function first result from Map method result is %v; want %v", x, 4)
         }
     }
 }
