@@ -21,6 +21,7 @@
  */
 
 package gofun
+import "fmt"
 
 type List struct {
     isCons bool
@@ -84,4 +85,17 @@ func (l *List) SetTail(tail *List) bool {
     } else {
         return false
     }
+}
+
+func (l *List) String() string {
+    s := "List["
+    isFirst := true
+    for l2 := l; l2.isCons; l2 = l2.tail {
+        if !isFirst {
+            s += " "
+        }
+        s += fmt.Sprintf("%v", l2.head)
+    }
+    s += "]"
+    return s
 }

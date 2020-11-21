@@ -21,6 +21,7 @@
  */
 
 package gofun
+import "fmt"
 
 type Either struct {
     isRight bool
@@ -35,7 +36,6 @@ func EitherOrElse(x interface{}, y *Either) *Either {
         return y
     }
 }
-
 
 func Left(x interface{}) *Either {
     return &Either { isRight: false, x: x }
@@ -98,5 +98,13 @@ func (e *Either) RightOrElse(e2 func() *Either) interface{} {
         return e
     } else {
         return e2()
+    }
+}
+
+func (e *Either) String() string {
+    if e.isRight {
+        return fmt.Sprintf("Right[%v]", e.x)
+    } else {
+        return fmt.Sprintf("Left[%v]", e.x)
     }
 }

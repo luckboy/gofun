@@ -21,6 +21,7 @@
  */
 
 package gofun
+import "fmt"
 
 type Option struct {
     isSome bool
@@ -69,5 +70,13 @@ func (o *Option) OrElse(o2 func() *Option) *Option {
         return o
     } else {
         return o2()
+    }
+}
+
+func (o *Option) String() string {
+    if o.isSome {
+        return fmt.Sprintf("Some[%v]", o.x)
+    } else {
+        return "None"
     }
 }
