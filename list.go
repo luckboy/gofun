@@ -95,6 +95,7 @@ func (l *List) String() string {
             s += " "
         }
         s += fmt.Sprintf("%v", l2.head)
+        isFirst = false
     }
     s += "]"
     return s
