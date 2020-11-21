@@ -21,6 +21,7 @@
  */
 
 package gofun
+import "fmt"
 
 type Pair struct {
     First interface{}
@@ -29,4 +30,17 @@ type Pair struct {
 
 func NewPair(first, second interface{}) *Pair {
     return &Pair { First: first, Second: second }
+}
+
+func PairOrElse(x interface{}, y *Pair) *Pair {
+    z, isOk := x.(*Pair)
+    if isOk {
+        return z
+    } else {
+        return y
+    }
+}
+
+func (p *Pair) String() string {
+    return fmt.Sprintf("Pair[%v %v]", p.First, p.Second)
 }
