@@ -177,7 +177,7 @@ func InterfacePairMapUnit(x interface{}) Monad {
     if isOk {
         return InterfacePairMap(map[interface{}]interface{} { p.First : p.Second })
     } else {
-        return nil
+        return InterfacePairMap(map[interface{}]interface{} {})
     }
 }
 
