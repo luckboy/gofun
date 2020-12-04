@@ -125,7 +125,7 @@ func TestBindMethodBindsST(t *testing.T) {
     })
     l, isOk := m.(ST)
     if !isOk {
-        t.Errorf("Bind result type isn't ST")
+        t.Errorf("Bind method result type isn't ST")
     } else {
         s, x := RunST(l, 1)
         if !reflect.DeepEqual(s, 1) {
@@ -150,7 +150,7 @@ func TestBindMethodBindsSTForMapMethod(t *testing.T) {
     })
     l, isOk := m.(ST)
     if !isOk {
-        t.Errorf("Bind result type isn't ST")
+        t.Errorf("Bind method result type isn't ST")
     } else {
         s, x := RunST(l, 1)
         if !reflect.DeepEqual(s, 2) {
@@ -256,7 +256,7 @@ func TestBindMethodBindsInterfacePairFunctionForMapMethod(t *testing.T) {
     })
     l, isOk := m.(InterfacePairFunction)
     if !isOk {
-        t.Errorf("Bind result type isn't InterfacePairFunction")
+        t.Errorf("Bind method result type isn't InterfacePairFunction")
     } else {
         y := l(3)
         if !reflect.DeepEqual(y, 10) {

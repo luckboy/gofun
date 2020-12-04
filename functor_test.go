@@ -89,7 +89,7 @@ func TestMapMethodMapsST(t *testing.T) {
     })
     ys, isOk := xs.(ST)
     if !isOk {
-        t.Errorf("Map result type isn't ST")
+        t.Errorf("Map method result type isn't ST")
     } else {
         s, x := RunST(ys, 1)
         if !reflect.DeepEqual(s, 1) {
@@ -147,7 +147,7 @@ func TestMapMethodMapsInterfacePairFunction(t *testing.T) {
     })
     ys, isOk := xs.(InterfacePairFunction)
     if !isOk {
-        t.Errorf("Map result type isn't InterfacePairFunction")
+        t.Errorf("Map method result type isn't InterfacePairFunction")
     } else {
         y := ys(4)
         if !reflect.DeepEqual(y, 7) {
