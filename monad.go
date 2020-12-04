@@ -106,7 +106,7 @@ func (m *List) Bind(f func(interface{}) Monad) Monad {
     for l := m; l.IsCons(); l = l.Tail() {
         zs, isOk := f(l.Head()).(*List)
         if isOk {
-            for l2 := zs; l.IsCons(); l2 = l2.Tail() {
+            for l2 := zs; l2.IsCons(); l2 = l2.Tail() {
                 l3 := Cons(l2.Head(), Nil())
                 if prev != nil {
                     prev.SetTail(l3)
