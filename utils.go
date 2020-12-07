@@ -201,3 +201,30 @@ func UintptrOrElse(x interface{}, y uintptr) uintptr {
         return y
     }
 }
+
+func InterfaceSliceOrElse(x interface{}, y InterfaceSlice) InterfaceSlice {
+    z, isOk := x.(InterfaceSlice)
+    if isOk {
+        return z
+    } else {
+        return y
+    }
+}
+
+func InterfacePairMapOrElse(x interface{}, y InterfacePairMap) InterfacePairMap {
+    z, isOk := x.(InterfacePairMap)
+    if isOk {
+        return z
+    } else {
+        return y
+    }
+}
+
+func InterfacePairFunctionOrElse(x interface{}, y InterfacePairFunction) InterfacePairFunction {
+    z, isOk := x.(InterfacePairFunction)
+    if isOk {
+        return z
+    } else {
+        return y
+    }
+}
