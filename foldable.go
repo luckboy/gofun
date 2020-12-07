@@ -203,6 +203,12 @@ func FoldRightM(f func(interface{}, interface{}) Monad, z interface{}, xs Foldab
     }
 }
 
+func Length(xs Foldable) int {
+    return IntOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
+            return IntOrElse(x, 0) + 1
+    }, 0), 0)
+}
+
 func NotElement(x interface{}, xs Foldable) bool {
     return !Element(x, xs)
 }
@@ -211,12 +217,6 @@ func Null(xs Foldable) bool {
     return BoolOrElse(xs.FoldLeft(func (x, y interface{}) interface{} {
             return false
     }, true), false)
-}
-
-func Length(xs Foldable) int {
-    return IntOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
-            return IntOrElse(x, 0) + 1
-    }, 0), 0)
 }
 
 func ToList(xs Foldable) *List {
