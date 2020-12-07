@@ -24,6 +24,27 @@ package gofun
 
 type ST func(interface{}) (interface{}, interface{})
 
+func STOrElse(x interface{}, y ST) ST {
+    z, isOk := x.(ST)
+    if isOk {
+        return z
+    } else {
+        return y
+    }
+}
+
 func RunST(st ST, x interface{}) (interface{}, interface{}) {
     return st(x)
+}
+
+func GetST() ST {
+    return ST(func(s interface{}) (interface{}, interface{}) {
+            return s, s
+    })
+}
+
+func SetST(newS interface{}) ST {
+    return ST(func(s interface{}) (interface{}, interface{}) {
+            return newS, struct{} {}
+    })
 }
