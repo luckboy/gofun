@@ -70,6 +70,71 @@ func Element(x interface{}, xs Foldable) bool {
     }, false), false)
 }
 
+func Filter(f func(interface{}) bool, xs Foldable) *List {
+    return ListOrElse(PairOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
+            if f(y) {
+                p := PairOrElse(x, NewPair(Nil(), nil))
+                ys := ListOrElse(p.First, Nil())
+                prev := ListOrElse(p.Second, nil)
+                l := Cons(y, Nil())
+                if prev != nil {
+                    prev.SetTail(l)
+                } else {
+                    ys = l
+                }
+                return NewPair(ys, l)
+            } else {
+                return x
+            }
+    }, NewPair(Nil(), nil)), NewPair(Nil(), nil)).First, Nil())
+}
+
+func FilterM(f func(interface{}) Monad, xs Foldable, u func(interface{}) Monad) Monad{
+    return MonadOrElse(FoldLeftM(func(x, y interface{}) Monad {
+            return MonadOrElse(f(y).Map(func(y2 interface{}) interface{} {
+                    if BoolOrElse(y2, false) {
+                        p := PairOrElse(x, NewPair(Nil(), nil))
+                        ys := ListOrElse(p.First, Nil())
+                        prev := ListOrElse(p.Second, nil)
+                        l := Cons(y, Nil())
+                        if prev != nil {
+                            prev.SetTail(l)
+                        } else {
+                            ys = l
+                        }
+                        return NewPair(ys, l)
+                    } else {
+                        return x
+                    }
+            }), u(Nil()))
+    }, NewPair(Nil(), nil), xs, u).Map(func(x interface{}) interface{} {
+            p := PairOrElse(x, NewPair(Nil(), nil))
+            return p.First
+    }), u(Nil()))
+}
+
+func FilterSlice(f func(interface{}) bool, xs Foldable) InterfaceSlice {
+    return InterfaceSliceOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
+            if f(y) {
+                return append(InterfaceSliceOrElse(x, InterfaceSlice([]interface{} {})), y)
+            } else {
+                return x
+            }
+    }, InterfaceSlice([]interface{} {})), InterfaceSlice([]interface{} {}))
+}
+
+func FilterSliceM(f func(interface{}) Monad, xs Foldable, u func(interface{}) Monad) Monad {
+    return FoldLeftM(func(x, y interface{}) Monad {
+            return MonadOrElse(f(y).Map(func(y2 interface{}) interface{} {
+                    if BoolOrElse(y2, false) {
+                        return append(InterfaceSliceOrElse(x, InterfaceSlice([]interface{} {})), y)
+                    } else {
+                        return x
+                    }
+            }), u(InterfaceSlice([]interface{} {})))
+    }, InterfaceSlice([]interface{} {}), xs, u)
+}
+
 func Find(f func(interface{}) bool, xs Foldable) *Option {
     return OptionOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
             o := OptionOrElse(x, None())
@@ -83,6 +148,23 @@ func Find(f func(interface{}) bool, xs Foldable) *Option {
                 }
             }
     }, None()), None())
+}
+
+func FindM(f func(interface{}) Monad, xs Foldable, u func(interface{}) Monad) Monad {
+    return FoldLeftM(func(x, y interface{}) Monad {
+            o := OptionOrElse(x, None())
+            if o.IsSome() {
+                return u(o)
+            } else {
+                return MonadOrElse(f(y).Map(func(y2 interface{}) interface{} {
+                        if BoolOrElse(y2, false) {
+                            return Some(y)
+                        } else {
+                            return None()
+                        }
+                }), u(None()))
+            }
+    }, None(), xs, u)
 }
 
 func FoldLeftM(f func(interface{}, interface{}) Monad, z interface{}, xs Foldable, u func(interface{}) Monad) Monad {
@@ -125,10 +207,37 @@ func NotElement(x interface{}, xs Foldable) bool {
     return !Element(x, xs)
 }
 
+func Null(xs Foldable) bool {
+    return BoolOrElse(xs.FoldLeft(func (x, y interface{}) interface{} {
+            return false
+    }, true), false)
+}
+
 func Length(xs Foldable) int {
     return IntOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
             return IntOrElse(x, 0) + 1
     }, 0), 0)
+}
+
+func ToList(xs Foldable) *List {
+    return ListOrElse(PairOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
+            p := PairOrElse(x, NewPair(Nil(), nil))
+            ys := ListOrElse(p.First, Nil())
+            prev := ListOrElse(p.Second, nil)
+            l := Cons(y, Nil())
+            if prev != nil {
+                prev.SetTail(l)
+            } else {
+                ys = l
+            }
+            return NewPair(ys, l)
+    }, NewPair(Nil(), nil)), NewPair(Nil(), nil)).First, Nil())
+}
+
+func ToSlice(f func(interface{}) bool, xs Foldable) InterfaceSlice {
+    return InterfaceSliceOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
+            return append(InterfaceSliceOrElse(x, InterfaceSlice([]interface{} {})), y)
+    }, InterfaceSlice([]interface{} {})), InterfaceSlice([]interface{} {}))
 }
 
 func (xs *Option) FoldLeft(f func(interface{}, interface{}) interface{}, z interface{}) interface{} {
