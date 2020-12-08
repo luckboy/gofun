@@ -250,8 +250,8 @@ func TestAllMFunctionReturnsFalseMonad(t *testing.T) {
         t.Errorf("AllM function result type isn't ST")
     } else {
         s, x := RunST(l, 0)
-        if !reflect.DeepEqual(s, 3) {
-            t.Errorf("RunST function first result from AllM function result is %v; want %v", s, 3)
+        if !reflect.DeepEqual(s, 1) {
+            t.Errorf("RunST function first result from AllM function result is %v; want %v", s, 1)
         }
         if !reflect.DeepEqual(x, false) {
             t.Errorf("RunST function second result from AllM function result is %v; want %v", x, false)
@@ -334,8 +334,8 @@ func TestAnyMFunctionReturnsTrueMonad(t *testing.T) {
         t.Errorf("AnyM function result type isn't ST")
     } else {
         s, x := RunST(l, 0)
-        if !reflect.DeepEqual(s, 3) {
-            t.Errorf("RunST function first result from AnyM function result is %v; want %v", s, 3)
+        if !reflect.DeepEqual(s, 2) {
+            t.Errorf("RunST function first result from AnyM function result is %v; want %v", s, 2)
         }
         if !reflect.DeepEqual(x, true) {
             t.Errorf("RunST function second result from AnyM function result is %v; want %v", x, true)
