@@ -234,7 +234,7 @@ func ToList(xs Foldable) *List {
     }, NewPair(Nil(), nil)), NewPair(Nil(), nil)).First, Nil())
 }
 
-func ToSlice(f func(interface{}) bool, xs Foldable) InterfaceSlice {
+func ToSlice(xs Foldable) InterfaceSlice {
     return InterfaceSliceOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
             return append(InterfaceSliceOrElse(x, InterfaceSlice([]interface{} {})), y)
     }, InterfaceSlice([]interface{} {})), InterfaceSlice([]interface{} {}))
