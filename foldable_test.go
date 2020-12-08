@@ -218,3 +218,358 @@ func TestFoldRightMethodFoldsInterfacePairMap(t *testing.T) {
         t.Errorf("FoldRight method result is %v; want %v", xs, InterfacePairMap(map[interface{}]interface{} { "a": 1, "b": 2 }))
     }
 }
+
+func TestAllFunctionReturnsFalse(t *testing.T) {
+    b := All(func(x interface{}) bool {
+            return IntOrElse(x, 0) % 2 == 0
+    }, InterfaceSlice([]interface{} { 2, 3, 4 }))
+    if b != false {
+        t.Errorf("All function result is %v; want %v", b, false)
+    }
+}
+
+func TestAllFunctionReturnsTrue(t *testing.T) {
+    b := All(func(x interface{}) bool {
+            return IntOrElse(x, 0) % 2 == 0
+    }, InterfaceSlice([]interface{} { 2, 4, 6 }))
+    if b != true {
+        t.Errorf("All function result is %v; want %v", b, true)
+    }
+}
+
+func TestAllMFunctionReturnsFalseMonad(t *testing.T) {
+    m := AllM(func(x interface{}) Monad {
+            return GetST().Bind(func(s interface{}) Monad {
+                    return SetST(IntOrElse(s, 0) + 1).Bind(func(r interface{}) Monad {
+                            return STUnit((IntOrElse(x, 0) + IntOrElse(s, 0)) % 2 == 0)
+                    })
+            })
+    }, InterfaceSlice([]interface{} { 1, 3, 3 }), STUnit)
+    l, isOk := m.(ST)
+    if !isOk {
+        t.Errorf("AllM function result type isn't ST")
+    } else {
+        s, x := RunST(l, 0)
+        if !reflect.DeepEqual(s, 3) {
+            t.Errorf("RunST function first result from AllM function result is %v; want %v", s, 3)
+        }
+        if !reflect.DeepEqual(x, false) {
+            t.Errorf("RunST function second result from AllM function result is %v; want %v", x, false)
+        }
+    }
+}
+
+func TestAllMFunctionReturnsTrueMonad(t *testing.T) {
+    m := AllM(func(x interface{}) Monad {
+            return GetST().Bind(func(s interface{}) Monad {
+                    return SetST(IntOrElse(s, 0) + 1).Bind(func(r interface{}) Monad {
+                            return STUnit((IntOrElse(x, 0) + IntOrElse(s, 0)) % 2 == 0)
+                    })
+            })
+    }, InterfaceSlice([]interface{} { 2, 3, 4 }), STUnit)
+    l, isOk := m.(ST)
+    if !isOk {
+        t.Errorf("AllM function result type isn't ST")
+    } else {
+        s, x := RunST(l, 0)
+        if !reflect.DeepEqual(s, 3) {
+            t.Errorf("RunST function first result from AllM function result is %v; want %v", s, 3)
+        }
+        if !reflect.DeepEqual(x, true) {
+            t.Errorf("RunST function second result from AllM function result is %v; want %v", x, true)
+        }
+    }
+}
+
+func TestAnyFunctionReturnsFalse(t *testing.T) {
+    b := Any(func(x interface{}) bool {
+            return IntOrElse(x, 0) % 2 == 0
+    }, InterfaceSlice([]interface{} { 1, 3, 5 }))
+    if b != false {
+        t.Errorf("Any function result is %v; want %v", b, false)
+    }
+}
+
+func TestAnyFunctionReturnsTrue(t *testing.T) {
+    b := Any(func(x interface{}) bool {
+            return IntOrElse(x, 0) % 2 == 0
+    }, InterfaceSlice([]interface{} { 1, 2, 3 }))
+    if b != true {
+        t.Errorf("Any function result is %v; want %v", b, true)
+    }
+}
+
+func TestAnyMFunctionReturnsFalseMonad(t *testing.T) {
+    m := AnyM(func(x interface{}) Monad {
+            return GetST().Bind(func(s interface{}) Monad {
+                    return SetST(IntOrElse(s, 0) + 1).Bind(func(r interface{}) Monad {
+                            return STUnit((IntOrElse(x, 0) + IntOrElse(s, 0)) % 2 == 0)
+                    })
+            })
+    }, InterfaceSlice([]interface{} { 1, 2, 3 }), STUnit)
+    l, isOk := m.(ST)
+    if !isOk {
+        t.Errorf("AnyM function result type isn't ST")
+    } else {
+        s, x := RunST(l, 0)
+        if !reflect.DeepEqual(s, 3) {
+            t.Errorf("RunST function first result from AnyM function result is %v; want %v", s, 3)
+        }
+        if !reflect.DeepEqual(x, false) {
+            t.Errorf("RunST function second result from AnyM function result is %v; want %v", x, false)
+        }
+    }
+}
+
+func TestAnyMFunctionReturnsTrueMonad(t *testing.T) {
+    m := AnyM(func(x interface{}) Monad {
+            return GetST().Bind(func(s interface{}) Monad {
+                    return SetST(IntOrElse(s, 0) + 1).Bind(func(r interface{}) Monad {
+                            return STUnit((IntOrElse(x, 0) + IntOrElse(s, 0)) % 2 == 0)
+                    })
+            })
+    }, InterfaceSlice([]interface{} { 1, 3, 3 }), STUnit)
+    l, isOk := m.(ST)
+    if !isOk {
+        t.Errorf("AnyM function result type isn't ST")
+    } else {
+        s, x := RunST(l, 0)
+        if !reflect.DeepEqual(s, 3) {
+            t.Errorf("RunST function first result from AnyM function result is %v; want %v", s, 3)
+        }
+        if !reflect.DeepEqual(x, true) {
+            t.Errorf("RunST function second result from AnyM function result is %v; want %v", x, true)
+        }
+    }
+}
+
+func TestElementFunctionFindsElement(t *testing.T) {
+    b := Element(2, InterfaceSlice([]interface{} { 1, 2, 3 }))
+    if b != true {
+        t.Errorf("Element function result is %v; want %v", b, true)
+    }
+}
+
+func TestElementFunctionDoesNotFindElement(t *testing.T) {
+    b := Element(4, InterfaceSlice([]interface{} { 1, 2, 3 }))
+    if b != false {
+        t.Errorf("Element function result is %v; want %v", b, false)
+    }
+}
+
+func TestFilterFunctionFilters(t *testing.T) {
+    xs := Filter(func(x interface{}) bool {
+            return IntOrElse(x, 0) % 2 == 0
+    }, InterfaceSlice([]interface{} { 1, 2, 3, 4 }))
+    if !reflect.DeepEqual(xs, Cons(2, Cons(4, Nil()))) {
+        t.Errorf("Filter function result is %v; want %v", xs, Cons(2, Cons(4, Nil())))
+    }
+}
+
+func TestFilterMFunctionFilters(t *testing.T) {
+    m := FilterM(func(x interface{}) Monad {
+            return GetST().Bind(func(s interface{}) Monad {
+                    return SetST(IntOrElse(s, 0) + 1).Bind(func(r interface{}) Monad {
+                            return STUnit((IntOrElse(x, 0) + IntOrElse(s, 0)) % 2 == 0)
+                    })
+            })
+    }, InterfaceSlice([]interface{} { 1, 3, 5, 7 }), STUnit)
+    l, isOk := m.(ST)
+    if !isOk {
+        t.Errorf("FilterM function result type isn't ST")
+    } else {
+        s, x := RunST(l, 0)
+        if !reflect.DeepEqual(s, 4) {
+            t.Errorf("RunST function first result from FilterM function result is %v; want %v", s, 4)
+        }
+        if !reflect.DeepEqual(x, Cons(3, Cons(7, Nil()))) {
+            t.Errorf("RunST function second result from FilterM function result is %v; want %v", x, Cons(3, Cons(7, Nil())))
+        }
+    }
+}
+
+func TestFilterSliceFunctionFilters(t *testing.T) {
+    xs := FilterSlice(func(x interface{}) bool {
+            return IntOrElse(x, 0) % 2 == 0
+    }, InterfaceSlice([]interface{} { 1, 2, 3, 4 }))
+    if !reflect.DeepEqual(xs, InterfaceSlice([]interface{} { 2, 4 })) {
+        t.Errorf("FilterSlice function result is %v; want %v", xs, InterfaceSlice([]interface{} { 2, 4 }))
+    }
+}
+
+func TestFilterSliceMFunctionFilters(t *testing.T) {
+    m := FilterSliceM(func(x interface{}) Monad {
+            return GetST().Bind(func(s interface{}) Monad {
+                    return SetST(IntOrElse(s, 0) + 1).Bind(func(r interface{}) Monad {
+                            return STUnit((IntOrElse(x, 0) + IntOrElse(s, 0)) % 2 == 0)
+                    })
+            })
+    }, InterfaceSlice([]interface{} { 1, 3, 5, 7 }), STUnit)
+    l, isOk := m.(ST)
+    if !isOk {
+        t.Errorf("FilterSliceM function result type isn't ST")
+    } else {
+        s, x := RunST(l, 0)
+        if !reflect.DeepEqual(s, 4) {
+            t.Errorf("RunST function first result from FilterSliceM function result is %v; want %v", s, 4)
+        }
+        if !reflect.DeepEqual(x, InterfaceSlice([]interface{} { 3, 7 })) {
+            t.Errorf("RunST function second result from FilterSliceM function result is %v; want %v", x, InterfaceSlice([]interface{} { 3, 7 }))
+        }
+    }
+}
+
+func TestFindFunctionFindsElement(t *testing.T) {
+    o := Find(func(x interface{}) bool {
+            return IntOrElse(x, 0) % 2 == 0
+    }, InterfaceSlice([]interface{} { 1, 2, 3 }))
+    if !reflect.DeepEqual(o, Some(2)) {
+        t.Errorf("Find function result is %v; want %v", o, Some(2))
+    }
+}
+
+func TestFindFunctionDoesNotFindElement(t *testing.T) {
+    o := Find(func(x interface{}) bool {
+            return IntOrElse(x, 0) % 2 == 0
+    }, InterfaceSlice([]interface{} { 1, 3, 5 }))
+    if !reflect.DeepEqual(o, None()) {
+        t.Errorf("Find function result is %v; want %v", o, None())
+    }
+}
+
+func TestFindMFunctionFindsElement(t *testing.T) {
+    m := FindM(func(x interface{}) Monad {
+            return GetST().Bind(func(s interface{}) Monad {
+                    return SetST(IntOrElse(s, 0) + 1).Bind(func(r interface{}) Monad {
+                            return STUnit((IntOrElse(x, 0) + IntOrElse(s, 0)) % 2 == 0)
+                    })
+            })
+    }, InterfaceSlice([]interface{} { 1, 3, 5 }), STUnit)
+    l, isOk := m.(ST)
+    if !isOk {
+        t.Errorf("FindM function result type isn't ST")
+    } else {
+        s, x := RunST(l, 0)
+        if !reflect.DeepEqual(s, 2) {
+            t.Errorf("RunST function first result from FindM function result is %v; want %v", s, 2)
+        }
+        if !reflect.DeepEqual(x, Some(3)) {
+            t.Errorf("RunST function second result from FindM function result is %v; want %v", x, Some(3))
+        }
+    }
+}
+
+func TestFindMFunctionDoesNotFindElement(t *testing.T) {
+    m := FindM(func(x interface{}) Monad {
+            return GetST().Bind(func(s interface{}) Monad {
+                    return SetST(IntOrElse(s, 0) + 1).Bind(func(r interface{}) Monad {
+                            return STUnit((IntOrElse(x, 0) + IntOrElse(s, 0)) % 2 == 0)
+                    })
+            })
+    }, InterfaceSlice([]interface{} { 1, 2, 3 }), STUnit)
+    l, isOk := m.(ST)
+    if !isOk {
+        t.Errorf("FindM function result type isn't ST")
+    } else {
+        s, x := RunST(l, 0)
+        if !reflect.DeepEqual(s, 3) {
+            t.Errorf("RunST function first result from FindM function result is %v; want %v", s, 3)
+        }
+        if !reflect.DeepEqual(x, None()) {
+            t.Errorf("RunST function second result from FindM function result is %v; want %v", x, None())
+        }
+    }
+}
+
+func TestFoldLeftMFunctionFolds(t *testing.T) {
+    m := FoldLeftM(func(x, y interface{}) Monad {
+            return GetST().Bind(func(s interface{}) Monad {
+                    return SetST(IntOrElse(s, 0) + 1).Bind(func(r interface{}) Monad {
+                            return STUnit(append(InterfaceSliceOrElse(x, InterfaceSlice([]interface{} {})), IntOrElse(y, 0) + IntOrElse(s, 0)))
+                    })
+            })
+    }, InterfaceSlice([]interface{} {}), InterfaceSlice([]interface{} { 1, 2, 3 }), STUnit)
+    l, isOk := m.(ST)
+    if !isOk {
+        t.Errorf("FoldLeftM function result type isn't ST")
+    } else {
+        s, x := RunST(l, 0)
+        if !reflect.DeepEqual(s, 3) {
+            t.Errorf("RunST function first result from FoldLeftM function result is %v; want %v", s, 3)
+        }
+        if !reflect.DeepEqual(x, InterfaceSlice([]interface{} { 1, 3, 5 })) {
+            t.Errorf("RunST function second result from FoldLeftM function result is %v; want %v", x, InterfaceSlice([]interface{} { 1, 3, 5 }))
+        }
+    }
+}
+
+func TestFoldRightMFunctionFolds(t *testing.T) {
+    m := FoldRightM(func(y, x interface{}) Monad {
+            return GetST().Bind(func(s interface{}) Monad {
+                    return SetST(IntOrElse(s, 0) + 1).Bind(func(r interface{}) Monad {
+                            return STUnit(append(InterfaceSliceOrElse(x, InterfaceSlice([]interface{} {})), IntOrElse(y, 0) + IntOrElse(s, 0)))
+                    })
+            })
+    }, InterfaceSlice([]interface{} {}), InterfaceSlice([]interface{} { 1, 2, 3 }), STUnit)
+    l, isOk := m.(ST)
+    if !isOk {
+        t.Errorf("FoldRightM function result type isn't ST")
+    } else {
+        s, x := RunST(l, 0)
+        if !reflect.DeepEqual(s, 3) {
+            t.Errorf("RunST function first result from FoldRightM function result is %v; want %v", s, 3)
+        }
+        if !reflect.DeepEqual(x, InterfaceSlice([]interface{} { 3, 3, 3 })) {
+            t.Errorf("RunST function second result from FoldRightM function result is %v; want %v", x, InterfaceSlice([]interface{} { 3, 3, 3 }))
+        }
+    }
+}
+
+func TestLengthFunctionCalculatesLength(t *testing.T) {
+    x := Length(InterfaceSlice([]interface{} { 1, 2, 3 }))
+    if x != 3 {
+        t.Errorf("Length function result is %v; want %v", x, 3)
+    }
+}
+
+func TestNotElementFunctionFindsElement(t *testing.T) {
+    b := NotElement(2, InterfaceSlice([]interface{} { 1, 2, 3 }))
+    if b != false {
+        t.Errorf("NotElement function result is %v; want %v", b, false)
+    }
+}
+
+func TestNotElementFunctionDoesNotFindElement(t *testing.T) {
+    b := NotElement(4, InterfaceSlice([]interface{} { 1, 2, 3 }))
+    if b != true {
+        t.Errorf("NotElement function result is %v; want %v", b, true)
+    }
+}
+
+func TestNullFunctionReturnsFalse(t *testing.T) {
+    b := Null(InterfaceSlice([]interface{} { 1, 2, 3 }))
+    if b != false {
+        t.Errorf("Null function result is %v; want %v", b, false)
+    }
+}
+
+func TestNullFunctionReturnsTrue(t *testing.T) {
+    b := Null(InterfaceSlice([]interface{} {}))
+    if b != true {
+        t.Errorf("Null function result is %v; want %v", b, true)
+    }
+}
+
+func TestToListFunctionReturnsList(t *testing.T) {
+    xs := ToList(InterfaceSlice([]interface{} { 1, 2, 3 }))
+    if !reflect.DeepEqual(xs, Cons(1, Cons(2, Cons(3, Nil())))) {
+        t.Errorf("ToList function result is %v; want %v", xs, Cons(1, Cons(2, Cons(3, Nil()))))
+    }
+}
+
+func TestToSliceFunctionReturnsSlice(t *testing.T) {
+    xs := ToSlice(InterfaceSlice([]interface{} { 1, 2, 3 }))
+    if !reflect.DeepEqual(xs, InterfaceSlice([]interface{} { 1, 2, 3 })) {
+        t.Errorf("ToSlice function result is %v; want %v", xs, InterfaceSlice([]interface{} { 1, 2, 3 }))
+    }
+}
