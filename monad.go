@@ -55,7 +55,7 @@ func Join(m Monad, f Monad) Monad {
 func UntilM(m Monad, cond func() Monad, u func(interface{}) Monad) Monad {
     return m.Bind(func(x interface{}) Monad {
             return cond().Bind(func(y interface{}) Monad {
-                    if !BoolOrElse(x, false) {
+                    if !BoolOrElse(y, false) {
                         return UntilM(m, cond, u)
                     } else {
                         return u(struct{} {})
