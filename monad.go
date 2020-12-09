@@ -46,32 +46,32 @@ func IfM(cond Monad, ifTrue, ifFalse func() Monad) Monad {
     });
 }
 
-func Join(m Monad, f Monad) Monad {
+func Join(m, fail Monad) Monad {
     return m.Bind(func(x interface{}) Monad {
-            return MonadOrElse(x, f)
+            return MonadOrElse(x, fail)
     })
 }
 
-func UntilM(m Monad, cond func() Monad, u func(interface{}) Monad) Monad {
+func UntilM(m Monad, cond func() Monad, unit func(interface{}) Monad) Monad {
     return m.Bind(func(x interface{}) Monad {
             return cond().Bind(func(y interface{}) Monad {
                     if !BoolOrElse(y, false) {
-                        return UntilM(m, cond, u)
+                        return UntilM(m, cond, unit)
                     } else {
-                        return u(struct{} {})
+                        return unit(struct{} {})
                     }
             })
     })
 }
 
-func WhileM(cond Monad, body func() Monad, u func(interface{}) Monad) Monad {
+func WhileM(cond Monad, body func() Monad, unit func(interface{}) Monad) Monad {
     return cond.Bind(func(x interface{}) Monad {
             if BoolOrElse(x, false) {
                 return body().Bind(func(y interface{}) Monad {
-                        return WhileM(cond, body, u)
+                        return WhileM(cond, body, unit)
                 })
             } else {
-                return u(struct{}{})
+                return unit(struct{} {})
             }
     })
 }

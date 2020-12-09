@@ -42,14 +42,14 @@ func All(f func(interface{}) bool, xs Foldable) bool {
     }, true), false)
 }
 
-func AllM(f func(interface{}) Monad, xs Foldable, u func(interface{}) Monad) Monad {
+func AllM(f func(interface{}) Monad, xs Foldable, unit func(interface{}) Monad) Monad {
     return FoldLeftM(func(x interface{}, y interface{}) Monad {
             if BoolOrElse(x, false) {
                 return f(y)
             } else {
-                return u(x)
+                return unit(x)
             }
-    }, true, xs, u)
+    }, true, xs, unit)
 }
 
 func Any(f func(interface{}) bool, xs Foldable) bool {
@@ -58,14 +58,14 @@ func Any(f func(interface{}) bool, xs Foldable) bool {
     }, false), false)
 }
 
-func AnyM(f func(interface{}) Monad, xs Foldable, u func(interface{}) Monad) Monad {
+func AnyM(f func(interface{}) Monad, xs Foldable, unit func(interface{}) Monad) Monad {
     return FoldLeftM(func(x interface{}, y interface{}) Monad {
             if BoolOrElse(x, false) {
-                return u(x)
+                return unit(x)
             } else {
                 return f(y)
             }
-    }, false, xs, u)
+    }, false, xs, unit)
 }
 
 func Element(x interface{}, xs Foldable) bool {
@@ -93,7 +93,7 @@ func Filter(f func(interface{}) bool, xs Foldable) *List {
     }, NewPair(Nil(), nil)), NewPair(Nil(), nil)).First, Nil())
 }
 
-func FilterM(f func(interface{}) Monad, xs Foldable, u func(interface{}) Monad) Monad{
+func FilterM(f func(interface{}) Monad, xs Foldable, unit func(interface{}) Monad) Monad{
     return MonadOrElse(FoldLeftM(func(x, y interface{}) Monad {
             return MonadOrElse(f(y).Map(func(y2 interface{}) interface{} {
                     if BoolOrElse(y2, false) {
@@ -110,11 +110,11 @@ func FilterM(f func(interface{}) Monad, xs Foldable, u func(interface{}) Monad) 
                     } else {
                         return x
                     }
-            }), u(Nil()))
-    }, NewPair(Nil(), nil), xs, u).Map(func(x interface{}) interface{} {
+            }), unit(Nil()))
+    }, NewPair(Nil(), nil), xs, unit).Map(func(x interface{}) interface{} {
             p := PairOrElse(x, NewPair(Nil(), nil))
             return p.First
-    }), u(Nil()))
+    }), unit(Nil()))
 }
 
 func FilterSlice(f func(interface{}) bool, xs Foldable) InterfaceSlice {
@@ -127,7 +127,7 @@ func FilterSlice(f func(interface{}) bool, xs Foldable) InterfaceSlice {
     }, InterfaceSlice([]interface{} {})), InterfaceSlice([]interface{} {}))
 }
 
-func FilterSliceM(f func(interface{}) Monad, xs Foldable, u func(interface{}) Monad) Monad {
+func FilterSliceM(f func(interface{}) Monad, xs Foldable, unit func(interface{}) Monad) Monad {
     return FoldLeftM(func(x, y interface{}) Monad {
             return MonadOrElse(f(y).Map(func(y2 interface{}) interface{} {
                     if BoolOrElse(y2, false) {
@@ -135,8 +135,8 @@ func FilterSliceM(f func(interface{}) Monad, xs Foldable, u func(interface{}) Mo
                     } else {
                         return x
                     }
-            }), u(InterfaceSlice([]interface{} {})))
-    }, InterfaceSlice([]interface{} {}), xs, u)
+            }), unit(InterfaceSlice([]interface{} {})))
+    }, InterfaceSlice([]interface{} {}), xs, unit)
 }
 
 func Find(f func(interface{}) bool, xs Foldable) *Option {
@@ -154,11 +154,11 @@ func Find(f func(interface{}) bool, xs Foldable) *Option {
     }, None()), None())
 }
 
-func FindM(f func(interface{}) Monad, xs Foldable, u func(interface{}) Monad) Monad {
+func FindM(f func(interface{}) Monad, xs Foldable, unit func(interface{}) Monad) Monad {
     return FoldLeftM(func(x, y interface{}) Monad {
             o := OptionOrElse(x, None())
             if o.IsSome() {
-                return u(o)
+                return unit(o)
             } else {
                 return MonadOrElse(f(y).Map(func(y2 interface{}) interface{} {
                         if BoolOrElse(y2, false) {
@@ -166,44 +166,44 @@ func FindM(f func(interface{}) Monad, xs Foldable, u func(interface{}) Monad) Mo
                         } else {
                             return None()
                         }
-                }), u(None()))
+                }), unit(None()))
             }
-    }, None(), xs, u)
+    }, None(), xs, unit)
 }
 
-func FoldLeftM(f func(interface{}, interface{}) Monad, z interface{}, xs Foldable, u func(interface{}) Monad) Monad {
+func FoldLeftM(f func(interface{}, interface{}) Monad, z interface{}, xs Foldable, unit func(interface{}) Monad) Monad {
     g, isOk := xs.FoldRight(func(y, x interface{}) interface{} {
         return func(x2 interface{}) Monad {
             h, isOk2 := x.(func(interface{}) Monad)
             if isOk2 {
                 return f(x2, y).Bind(h)
             } else {
-                return u(x2)
+                return unit(x2)
             }
         }
-    }, u).(func(interface{}) Monad)
+    }, unit).(func(interface{}) Monad)
     if isOk {
         return g(z)
     } else {
-        return u(z)
+        return unit(z)
     }
 }
 
-func FoldRightM(f func(interface{}, interface{}) Monad, z interface{}, xs Foldable, u func(interface{}) Monad) Monad {
+func FoldRightM(f func(interface{}, interface{}) Monad, z interface{}, xs Foldable, unit func(interface{}) Monad) Monad {
     g, isOk := xs.FoldLeft(func(x, y interface{}) interface{} {
         return func(x2 interface{}) Monad {
             h, isOk2 := x.(func(interface{}) Monad)
             if isOk2 {
                 return f(y, x2).Bind(h)
             } else {
-                return u(x2)
+                return unit(x2)
             }
         }
-    }, u).(func(interface{}) Monad)
+    }, unit).(func(interface{}) Monad)
     if isOk {
         return g(z)
     } else {
-        return u(z)
+        return unit(z)
     }
 }
 
