@@ -264,3 +264,132 @@ func TestBindMethodBindsInterfacePairFunctionForMapMethod(t *testing.T) {
         }
     }
 }
+
+func TestIfMFunctionSelectsIfTrue(t *testing.T) {
+    m := IfM(GetST().Bind(func(s interface{}) Monad {
+            return SetST(IntOrElse(s, 0) + 1).Bind(func(r interface{}) Monad {
+                    return STUnit(true)
+            })
+    }), func() Monad {
+        return GetST().Bind(func(s interface{}) Monad {
+                return SetST(IntOrElse(s, 0) + 2).Bind(func(r interface{}) Monad {
+                        return STUnit(1)
+                })
+        })
+    }, func() Monad {
+        return GetST().Bind(func(s interface{}) Monad {
+                return SetST(IntOrElse(s, 0) + 1).Bind(func(r interface{}) Monad {
+                        return STUnit(0)
+                })
+        })
+    })
+    l, isOk := m.(ST)
+    if !isOk {
+        t.Errorf("IfM function result type isn't ST")
+    } else {
+        s, x := RunST(l, 0)
+        if !reflect.DeepEqual(s, 3) {
+            t.Errorf("RunST function first result from IfM function result is %v; want %v", s, 3)
+        }
+        if !reflect.DeepEqual(x, 1) {
+            t.Errorf("RunST function second result from IfM function result is %v; want %v", x, 1)
+        }
+    }
+}
+
+func TestIfMFunctionSelectsIfFalse(t *testing.T) {
+    m := IfM(GetST().Bind(func(s interface{}) Monad {
+            return SetST(IntOrElse(s, 0) + 1).Bind(func(r interface{}) Monad {
+                    return STUnit(false)
+            })
+    }), func() Monad {
+        return GetST().Bind(func(s interface{}) Monad {
+                return SetST(IntOrElse(s, 0) + 2).Bind(func(r interface{}) Monad {
+                        return STUnit(1)
+                })
+        })
+    }, func() Monad {
+        return GetST().Bind(func(s interface{}) Monad {
+                return SetST(IntOrElse(s, 0) + 1).Bind(func(r interface{}) Monad {
+                        return STUnit(0)
+                })
+        })
+    })
+    l, isOk := m.(ST)
+    if !isOk {
+        t.Errorf("IfM function result type isn't ST")
+    } else {
+        s, x := RunST(l, 0)
+        if !reflect.DeepEqual(s, 2) {
+            t.Errorf("RunST function first result from IfM function result is %v; want %v", s, 3)
+        }
+        if !reflect.DeepEqual(x, 0) {
+            t.Errorf("RunST function second result from IfM function result is %v; want %v", x, 0)
+        }
+    }
+}
+
+func TestJoinFunctionJoinsNone(t *testing.T) {
+    m := Join(None(), None())
+    if !reflect.DeepEqual(m, None()) {
+        t.Errorf("Join function result is %v; want %v", m, None())
+    }
+}
+
+func TestJoinFunctionJoinsSomeNone(t *testing.T) {
+    m := Join(Some(None()), None())
+    if !reflect.DeepEqual(m, None()) {
+        t.Errorf("Join function result is %v; want %v", m, None())
+    }
+}
+
+func TestJoinFunctionJoinsSomeSome(t *testing.T) {
+    m := Join(Some(Some(2)), None())
+    if !reflect.DeepEqual(m, Some(2)) {
+        t.Errorf("Join function result is %v; want %v", m, Some(2))
+    }
+}
+
+func TestUnitlMFunctionIncreasesState(t *testing.T) {
+    m := UntilM(GetST().Bind(func(s interface{}) Monad {
+            return SetST(IntOrElse(s, 0) + 1)
+    }), func() Monad {
+            return GetST().Bind(func(s interface{}) Monad {
+                    return STUnit(IntOrElse(s, 0) >= 3)
+            })
+    }, STUnit)
+    l, isOk := m.(ST)
+    if !isOk {
+        t.Errorf("UntilM function result type isn't ST")
+    } else {
+        s, x := RunST(l, 0)
+        if !reflect.DeepEqual(s, 3) {
+            t.Errorf("RunST function first result from UntiltM function result is %v; want %v", s, 3)
+        }
+        if !reflect.DeepEqual(x, struct{} {}) {
+            t.Errorf("RunST function second result from UntilM function result is %v; want %v", x, struct{} {})
+        }
+    }
+}
+
+func TestWhileMFunctionIncreasesState(t *testing.T) {
+    m := WhileM(GetST().Bind(func(s interface{}) Monad {
+            return STUnit(IntOrElse(s, 0) < 3)
+    }), func() Monad {
+            return GetST().Bind(func(s interface{}) Monad {
+                    return SetST(IntOrElse(s, 0) + 1)
+            })
+    }, STUnit)
+    l, isOk := m.(ST)
+    if !isOk {
+        t.Errorf("WhileM function result type isn't ST")
+    } else {
+        s, x := RunST(l, 0)
+        if !reflect.DeepEqual(s, 3) {
+            t.Errorf("RunST function first result from WhileM function result is %v; want %v", s, 3)
+        }
+        if !reflect.DeepEqual(x, struct{} {}) {
+            t.Errorf("RunST function second result from WhileM function result is %v; want %v", x, struct{} {})
+        }
+    }
+}
