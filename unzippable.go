@@ -26,6 +26,15 @@ type Unzippable interface {
     Unzip(fail Zippable) (Zippable, Zippable)
 }
 
+func UnzippableOrElse(x interface{}, y Unzippable) Unzippable {
+    z, isOk := x.(Unzippable)
+    if isOk {
+        return z
+    } else {
+        return y
+    }
+}
+
 func (xs *Option) Unzip(fail Zippable) (Zippable, Zippable) {
     if xs.IsSome() {
         p, isOk := xs.Get().(*Pair)

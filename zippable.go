@@ -26,6 +26,15 @@ type Zippable interface {
     Zip(ys Zippable, fail Unzippable) Unzippable
 }
 
+func ZippableOrElse(x interface{}, y Zippable) Zippable {
+    z, isOk := x.(Zippable)
+    if isOk {
+        return z
+    } else {
+        return y
+    }
+}
+
 func (xs *Option) Zip(ys Zippable, fail Unzippable) Unzippable {
     ys2, isOk := ys.(*Option)
     if isOk {
