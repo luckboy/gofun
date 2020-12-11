@@ -55,9 +55,9 @@ func (xs *Either) Zip(ys Zippable, fail Unzippable) Unzippable {
             return Right(NewPair(xs.GetRight(), ys2.GetRight()))
         } else {
             if xs.IsLeft() {
-                return xs
+                return Left(xs.GetLeft())
             } else {
-                return ys2
+                return Left(ys2.GetLeft())
             }
         }
     } else {
