@@ -100,3 +100,23 @@ func (l *List) String() string {
     s += "]"
     return s
 }
+
+func (xs *List) Concat(ys *List) *List {
+    var zs *List = Nil()
+    var prev *List = nil
+    for l := xs; l.IsCons(); l = l.Tail() {
+        l2 := Cons(l.Head(), Nil())
+        if prev != nil {
+            prev.SetTail(l2)
+        } else {
+            zs = l2
+        }
+        prev = l2
+    }
+    if prev != nil {
+        prev.SetTail(ys)
+    } else {
+        zs = ys
+    }
+    return zs
+}
