@@ -343,6 +343,20 @@ func TestAnyMFunctionReturnsTrueMonad(t *testing.T) {
     }
 }
 
+func TestDeepElementFunctionFindsElement(t *testing.T) {
+    b := DeepElement(Some(2), InterfaceSlice([]interface{} { Some(1), Some(2), Some(3) }))
+    if b != true {
+        t.Errorf("DeepElement function result is %v; want %v", b, true)
+    }
+}
+
+func TestDeepElementFunctionDoesNotFindElement(t *testing.T) {
+    b := DeepElement(Some(4), InterfaceSlice([]interface{} { Some(1), Some(2), Some(3) }))
+    if b != false {
+        t.Errorf("DeepElement function result is %v; want %v", b, false)
+    }
+}
+
 func TestElementFunctionFindsElement(t *testing.T) {
     b := Element(2, InterfaceSlice([]interface{} { 1, 2, 3 }))
     if b != true {
@@ -529,6 +543,20 @@ func TestLengthFunctionCalculatesLength(t *testing.T) {
     x := Length(InterfaceSlice([]interface{} { 1, 2, 3 }))
     if x != 3 {
         t.Errorf("Length function result is %v; want %v", x, 3)
+    }
+}
+
+func TestNotDeepElementFunctionFindsElement(t *testing.T) {
+    b := NotDeepElement(Some(2), InterfaceSlice([]interface{} { Some(1), Some(2), Some(3) }))
+    if b != false {
+        t.Errorf("NotDeepElement function result is %v; want %v", b, false)
+    }
+}
+
+func TestNotDeepElementFunctionDoesNotFindElement(t *testing.T) {
+    b := NotDeepElement(Some(4), InterfaceSlice([]interface{} { Some(1), Some(2), Some(3) }))
+    if b != true {
+        t.Errorf("NotDeepElement function result is %v; want %v", b, true)
     }
 }
 
