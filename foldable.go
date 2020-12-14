@@ -21,6 +21,7 @@
  */
 
 package gofun
+import "reflect"
 
 type Foldable interface {
     FoldLeft(f func(interface{}, interface{}) interface{}, z interface{}) interface{}
@@ -66,6 +67,12 @@ func AnyM(f func(interface{}) Monad, xs Foldable, unit func(interface{}) Monad) 
                 return f(y)
             }
     }, false, xs, unit)
+}
+
+func DeepElement(x interface{}, xs Foldable) bool {
+    return BoolOrElse(xs.FoldLeft(func(y, z interface{}) interface{} {
+            return BoolOrElse(y, false) || reflect.DeepEqual(z, x)
+    }, false), false)
 }
 
 func Element(x interface{}, xs Foldable) bool {
@@ -211,6 +218,10 @@ func Length(xs Foldable) int {
     return IntOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
             return IntOrElse(x, 0) + 1
     }, 0), 0)
+}
+
+func NotDeepElement(x interface{}, xs Foldable) bool {
+    return !DeepElement(x, xs)
 }
 
 func NotElement(x interface{}, xs Foldable) bool {
