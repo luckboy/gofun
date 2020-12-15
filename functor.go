@@ -22,10 +22,13 @@
 
 package gofun
 
+// Functor is the interface for functors.
 type Functor interface {
+    // Map maps elements.
     Map(func(interface{}) interface{}) Functor
 }
 
+// FunctorOrElse returns x if x is Functor, otherwise y.
 func FunctorOrElse(x interface{}, y Functor) Functor {
     z, isOk := x.(Functor)
     if isOk {

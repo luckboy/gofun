@@ -20,13 +20,18 @@
  * THE SOFTWARE.
  */
 
+// Package gofun provides functions, types, and constructions from functional languages.
 package gofun
 
+// Monad is the interface for monads.
 type Monad interface {
     Functor
+    // Bind binds Monad and a function that returns Monad. Binding allows to
+    // create data pipes.
     Bind(func(interface{}) Monad) Monad
 }
 
+// MonadOrElse returns x if x is Monad, otherwise y.
 func MonadOrElse(x interface{}, y Monad) Monad {
     z, isOk := x.(Monad)
     if isOk {
@@ -36,6 +41,7 @@ func MonadOrElse(x interface{}, y Monad) Monad {
     }
 }
 
+// IfM returns ifTrue() Monad if cond is Monad with true, otherwise ifFalse() Monad. 
 func IfM(cond Monad, ifTrue, ifFalse func() Monad) Monad {
     return cond.Bind(func(x interface{}) Monad {
             if BoolOrElse(x, false) {
@@ -46,12 +52,14 @@ func IfM(cond Monad, ifTrue, ifFalse func() Monad) Monad {
     });
 }
 
+// Join joins Monad. Fail must be a failure Monad. 
 func Join(m, fail Monad) Monad {
     return m.Bind(func(x interface{}) Monad {
             return MonadOrElse(x, fail)
     })
 }
 
+// UntilM is a loop of until type for monads. Unit must be the unit function for specified monad.
 func UntilM(m Monad, cond func() Monad, unit func(interface{}) Monad) Monad {
     return m.Bind(func(x interface{}) Monad {
             return cond().Bind(func(y interface{}) Monad {
@@ -64,6 +72,7 @@ func UntilM(m Monad, cond func() Monad, unit func(interface{}) Monad) Monad {
     })
 }
 
+// WhileM is a loop of while type for monads. Unit must be the unit function for specified monad.
 func WhileM(cond Monad, body func() Monad, unit func(interface{}) Monad) Monad {
     return cond.Bind(func(x interface{}) Monad {
             if BoolOrElse(x, false) {
@@ -84,6 +93,7 @@ func (m *Option) Bind(f func(interface{}) Monad) Monad {
     }
 }
 
+// OptionUnit is an unit function for Option.
 func OptionUnit(x interface{}) Monad {
     return Some(x)
 }
@@ -96,6 +106,7 @@ func (m *Either) Bind(f func(interface{}) Monad) Monad {
     }
 }
 
+// EitherUnit is an unit function for Either.
 func EitherUnit(x interface{}) Monad {
     return Right(x)
 }
@@ -120,6 +131,7 @@ func (m *List) Bind(f func(interface{}) Monad) Monad {
     return ys
 }
 
+// ListUnit is an unit function for List.
 func ListUnit(x interface{}) Monad {
     return Cons(x, Nil())
 }
@@ -136,6 +148,7 @@ func (m ST) Bind(f func(interface{}) Monad) Monad {
     })
 }
 
+// STUnit is an unit function for ST.
 func STUnit(x interface{}) Monad {
     return ST(func(s interface{}) (interface{}, interface{}) {
             return s, x
@@ -155,6 +168,7 @@ func (m InterfaceSlice) Bind(f func(interface{}) Monad) Monad {
     return InterfaceSlice(ys)
 }
 
+// InterfaceSliceUnit is an unit function for InterfaceSlice.
 func InterfaceSliceUnit(x interface{}) Monad {
     return InterfaceSlice([]interface{} { x })
 }
@@ -172,6 +186,7 @@ func (m InterfacePairMap) Bind(f func(interface{}) Monad) Monad {
     return InterfacePairMap(ys)
 }
 
+// InterfacePairMapUnit is an unit function for InterfacePairMap.
 func InterfacePairMapUnit(x interface{}) Monad {
     p, isOk := x.(*Pair)
     if isOk {
@@ -192,6 +207,7 @@ func (m InterfacePairFunction) Bind(f func(interface{}) Monad) Monad {
     })
 }
 
+// InterfacePairFunctionUnit is an unit function for InterfacePairFunction.
 func InterfacePairFunctionUnit(x interface{}) Monad {
     return InterfacePairFunction(func(y interface{}) interface{} {
             return x

@@ -23,7 +23,10 @@
 package gofun
 
 type (
+    // InterfaceSlice encapsulates []interface{}.
     InterfaceSlice []interface{}
+    // InterfacePairMap encapsulates map[interface{}]interface{}.
     InterfacePairMap map[interface{}]interface{}
+    // InterfacePairFunction encapsulates func(interface{}) interface{}.
     InterfacePairFunction func(interface{}) interface{}
 )

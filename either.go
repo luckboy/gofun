@@ -23,11 +23,13 @@
 package gofun
 import "fmt"
 
+// Either represents one of two values.
 type Either struct {
     isRight bool
     x interface{}
 }
 
+// EitherOrElse returns x if x is Either pointer, otherwise y.
 func EitherOrElse(x interface{}, y *Either) *Either {
     z, isOk := x.(*Either)
     if isOk {
@@ -37,22 +39,27 @@ func EitherOrElse(x interface{}, y *Either) *Either {
     }
 }
 
+// Left creates an Either with a left value. 
 func Left(x interface{}) *Either {
     return &Either { isRight: false, x: x }
 }
 
+// Right creates an Either with a right value. 
 func Right(x interface{}) *Either {
     return &Either { isRight: true, x: x }
 }
 
+// IsLeft returns true if e contains a left value, otherwise false.
 func (e *Either) IsLeft() bool {
     return !e.isRight
 }
 
+// IsRight returns true if e contains a right value, otherwise false.
 func (e *Either) IsRight() bool {
     return e.isRight
 }
 
+// GetLeft returns a left value.
 func (e *Either) GetLeft() interface{} {
     if e.isRight {
         return nil
@@ -61,6 +68,7 @@ func (e *Either) GetLeft() interface{} {
     }
 }
 
+// GetRight returns a right value.
 func (e *Either) GetRight() interface{} {
     if e.isRight {
         return e.x
@@ -69,6 +77,7 @@ func (e *Either) GetRight() interface{} {
     }
 }
 
+// GetLeftOrElse returns a left value if e contains the left value, otherwise x().
 func (e *Either) GetLeftOrElse(x func() interface{}) interface{} {
     if e.isRight {
         return x()
@@ -77,6 +86,7 @@ func (e *Either) GetLeftOrElse(x func() interface{}) interface{} {
     }
 }
 
+// LeftOrElse returns e if e contains the left value, otherwise e2().
 func (e *Either) LeftOrElse(e2 func() *Either) interface{} {
     if e.isRight {
         return e2()
@@ -85,6 +95,7 @@ func (e *Either) LeftOrElse(e2 func() *Either) interface{} {
     }
 }
 
+// GetRightOrElse returns a right value if e contains the right value, otherwise x().
 func (e *Either) GetRightOrElse(x func() interface{}) interface{} {
     if e.isRight {
         return e.x
@@ -93,6 +104,7 @@ func (e *Either) GetRightOrElse(x func() interface{}) interface{} {
     }
 }
 
+// RightOrElse returns e if e contains a right value, otherwise e2().
 func (e *Either) RightOrElse(e2 func() *Either) interface{} {
     if e.isRight {
         return e

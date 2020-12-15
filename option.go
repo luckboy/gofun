@@ -23,11 +23,13 @@
 package gofun
 import "fmt"
 
+// Option represents optional values.
 type Option struct {
     isSome bool
     x interface{}
 }
 
+// OptionOrElse returns x if x is Option pointer, otherwise y.
 func OptionOrElse(x interface{}, y *Option) *Option {
     z, isOk := x.(*Option)
     if isOk {
@@ -37,26 +39,32 @@ func OptionOrElse(x interface{}, y *Option) *Option {
     }
 }
 
+// None creates a Option without a value.
 func None() *Option {
     return &Option { isSome: false, x: nil } 
 }
 
+// Some creates a Option with a value.
 func Some(x interface{}) *Option {
     return &Option { isSome: true, x: x }
 }
 
+// IsNone returns true if o doesn't contain a value, otherwise false.
 func (o *Option) IsNone() bool {
     return !o.isSome
 }
 
+// IsNone returns true if o contains a value, otherwise false.
 func (o *Option) IsSome() bool {
     return o.isSome
 }
 
+// Get returns a value.
 func (o *Option) Get() interface{} {
     return o.x
 }
 
+// GetOrElse returns a value if o contains the value, otherwise x().
 func (o *Option) GetOrElse(x func() interface{}) interface{} {
     if o.isSome {
         return o.x
@@ -65,6 +73,7 @@ func (o *Option) GetOrElse(x func() interface{}) interface{} {
     }
 }
 
+// OrElse returns o if o contains a value, otherwise o2().
 func (o *Option) OrElse(o2 func() *Option) *Option {
     if o.isSome {
         return o

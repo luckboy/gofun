@@ -23,15 +23,18 @@
 package gofun
 import "fmt"
 
+// Pair represents pair.
 type Pair struct {
     First interface{}
     Second interface{}
 }
 
+// NewPair creates a pair.
 func NewPair(first, second interface{}) *Pair {
     return &Pair { First: first, Second: second }
 }
 
+// PairOrElse returns x if x is Pair pointer, otherwise y.
 func PairOrElse(x interface{}, y *Pair) *Pair {
     z, isOk := x.(*Pair)
     if isOk {

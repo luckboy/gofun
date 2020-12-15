@@ -22,8 +22,10 @@
 
 package gofun
 
+// ST represents a state monads.
 type ST func(interface{}) (interface{}, interface{})
 
+// STOrElse returns x if x is ST, otherwise y.
 func STOrElse(x interface{}, y ST) ST {
     z, isOk := x.(ST)
     if isOk {
@@ -33,16 +35,19 @@ func STOrElse(x interface{}, y ST) ST {
     }
 }
 
+// RunST runs the ST monad.
 func RunST(st ST, x interface{}) (interface{}, interface{}) {
     return st(x)
 }
 
+// GetST returns the ST monad with the state.
 func GetST() ST {
     return ST(func(s interface{}) (interface{}, interface{}) {
             return s, s
     })
 }
 
+// SetST sets a new state.
 func SetST(newS interface{}) ST {
     return ST(func(s interface{}) (interface{}, interface{}) {
             return newS, struct{} {}

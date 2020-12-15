@@ -23,11 +23,17 @@
 package gofun
 import "reflect"
 
+// Foldable is the interface for folding.
 type Foldable interface {
+    // FoldLeft folds Foldable from left side. Left folding is 
+    // calculated f(...f(f(z, x[0]), x[1])..., x[n-1]).
     FoldLeft(f func(interface{}, interface{}) interface{}, z interface{}) interface{}
+    // FoldLeft folds Foldable from right side. Right folding is
+    // calculated f(x[0], f(x[1], ...f(x[n-1], z)...)).
     FoldRight(f func(interface{}, interface{}) interface{}, z interface{}) interface{}
 }
 
+// FoldableOrElse returns x if x is Foldable, otherwise y.
 func FoldableOrElse(x interface{}, y Foldable) Foldable {
     z, isOk := x.(Foldable)
     if isOk {
@@ -37,12 +43,15 @@ func FoldableOrElse(x interface{}, y Foldable) Foldable {
     }
 }
 
+// All returns true if f returns true for all elements, otherwise false.
 func All(f func(interface{}) bool, xs Foldable) bool {
     return BoolOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
             return BoolOrElse(x, false) && f(y)
     }, true), false)
 }
 
+// AllM is similar to All but returns Monad and f returns Monad instead of bool values. Unit must be
+// the unit function for specified monad.
 func AllM(f func(interface{}) Monad, xs Foldable, unit func(interface{}) Monad) Monad {
     return FoldLeftM(func(x interface{}, y interface{}) Monad {
             if BoolOrElse(x, false) {
@@ -53,12 +62,15 @@ func AllM(f func(interface{}) Monad, xs Foldable, unit func(interface{}) Monad) 
     }, true, xs, unit)
 }
 
+// Any returns true if f returns true for any element, otherwise false.
 func Any(f func(interface{}) bool, xs Foldable) bool {
     return BoolOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
             return BoolOrElse(x, false) || f(y)
     }, false), false)
 }
 
+// AnyM is similar to All but returns Monad and f returns Monad instead of bool values. Unit must be
+// the unit function for specified monad.
 func AnyM(f func(interface{}) Monad, xs Foldable, unit func(interface{}) Monad) Monad {
     return FoldLeftM(func(x interface{}, y interface{}) Monad {
             if BoolOrElse(x, false) {
@@ -69,18 +81,21 @@ func AnyM(f func(interface{}) Monad, xs Foldable, unit func(interface{}) Monad) 
     }, false, xs, unit)
 }
 
+// DeepElement is similar to Element but uses reflect.DeepEqual instead of equal operator.
 func DeepElement(x interface{}, xs Foldable) bool {
     return BoolOrElse(xs.FoldLeft(func(y, z interface{}) interface{} {
             return BoolOrElse(y, false) || reflect.DeepEqual(z, x)
     }, false), false)
 }
 
+// Element returns true if Foldable contains the element, otherwise false. 
 func Element(x interface{}, xs Foldable) bool {
     return BoolOrElse(xs.FoldLeft(func(y, z interface{}) interface{} {
             return BoolOrElse(y, false) || z == x
     }, false), false)
 }
 
+// Filter filters the elements and returns a list of the filtered elements.
 func Filter(f func(interface{}) bool, xs Foldable) *List {
     return ListOrElse(PairOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
             if f(y) {
@@ -100,6 +115,8 @@ func Filter(f func(interface{}) bool, xs Foldable) *List {
     }, NewPair(Nil(), nil)), NewPair(Nil(), nil)).First, Nil())
 }
 
+// FilterM is similar to Filter but returns Monad and f returns Monad instead of list and bool value. 
+// Unit must be the unit function for specified monad.
 func FilterM(f func(interface{}) Monad, xs Foldable, unit func(interface{}) Monad) Monad{
     return MonadOrElse(FoldLeftM(func(x, y interface{}) Monad {
             return MonadOrElse(f(y).Map(func(y2 interface{}) interface{} {
@@ -124,6 +141,7 @@ func FilterM(f func(interface{}) Monad, xs Foldable, unit func(interface{}) Mona
     }), unit(Nil()))
 }
 
+// FilterSlice filters the elements and returns a slice of the filtered elements.
 func FilterSlice(f func(interface{}) bool, xs Foldable) InterfaceSlice {
     return InterfaceSliceOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
             if f(y) {
@@ -134,6 +152,8 @@ func FilterSlice(f func(interface{}) bool, xs Foldable) InterfaceSlice {
     }, InterfaceSlice([]interface{} {})), InterfaceSlice([]interface{} {}))
 }
 
+// FilterSliceM is similar to FilterSlice but returns Monad and f returns Monad instead of slice and
+// bool value. Unit must be the unit function for specified monad.
 func FilterSliceM(f func(interface{}) Monad, xs Foldable, unit func(interface{}) Monad) Monad {
     return FoldLeftM(func(x, y interface{}) Monad {
             return MonadOrElse(f(y).Map(func(y2 interface{}) interface{} {
@@ -146,6 +166,7 @@ func FilterSliceM(f func(interface{}) Monad, xs Foldable, unit func(interface{})
     }, InterfaceSlice([]interface{} {}), xs, unit)
 }
 
+// Find finds the element.
 func Find(f func(interface{}) bool, xs Foldable) *Option {
     return OptionOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
             o := OptionOrElse(x, None())
@@ -161,6 +182,8 @@ func Find(f func(interface{}) bool, xs Foldable) *Option {
     }, None()), None())
 }
 
+// FindM is similar to Find but returns Monad and f returns Monad instead of optional element and
+// bool value. Unit must be the unit function for specified monad.
 func FindM(f func(interface{}) Monad, xs Foldable, unit func(interface{}) Monad) Monad {
     return FoldLeftM(func(x, y interface{}) Monad {
             o := OptionOrElse(x, None())
@@ -178,6 +201,8 @@ func FindM(f func(interface{}) Monad, xs Foldable, unit func(interface{}) Monad)
     }, None(), xs, unit)
 }
 
+// FoldLeftM is similar to FoldLeft but returns Monad and f returns Monad instead of a value. Unit
+// must be the unit function for specified monad.
 func FoldLeftM(f func(interface{}, interface{}) Monad, z interface{}, xs Foldable, unit func(interface{}) Monad) Monad {
     g, isOk := xs.FoldRight(func(y, x interface{}) interface{} {
         return func(x2 interface{}) Monad {
@@ -196,6 +221,8 @@ func FoldLeftM(f func(interface{}, interface{}) Monad, z interface{}, xs Foldabl
     }
 }
 
+// FoldRightM is similar to FoldRight but returns Monad and f returns Monad instead of a value. Unit
+// must be the unit function for specified monad.
 func FoldRightM(f func(interface{}, interface{}) Monad, z interface{}, xs Foldable, unit func(interface{}) Monad) Monad {
     g, isOk := xs.FoldLeft(func(x, y interface{}) interface{} {
         return func(x2 interface{}) Monad {
@@ -214,26 +241,31 @@ func FoldRightM(f func(interface{}, interface{}) Monad, z interface{}, xs Foldab
     }
 }
 
+// Length returns the length of Folable.
 func Length(xs Foldable) int {
     return IntOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
             return IntOrElse(x, 0) + 1
     }, 0), 0)
 }
 
+// NotDeepElement is a DeepElement negation.
 func NotDeepElement(x interface{}, xs Foldable) bool {
     return !DeepElement(x, xs)
 }
 
+// NotElement is an Element negation.
 func NotElement(x interface{}, xs Foldable) bool {
     return !Element(x, xs)
 }
 
+// Null returns true if Foldable is empty, otherwise false.
 func Null(xs Foldable) bool {
     return BoolOrElse(xs.FoldLeft(func (x, y interface{}) interface{} {
             return false
     }, true), false)
 }
 
+// ToList converts Foldable to a list.
 func ToList(xs Foldable) *List {
     return ListOrElse(PairOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
             p := PairOrElse(x, NewPair(Nil(), nil))
@@ -249,6 +281,7 @@ func ToList(xs Foldable) *List {
     }, NewPair(Nil(), nil)), NewPair(Nil(), nil)).First, Nil())
 }
 
+// ToSlice converts Foldable to a slice.
 func ToSlice(xs Foldable) InterfaceSlice {
     return InterfaceSliceOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
             return append(InterfaceSliceOrElse(x, InterfaceSlice([]interface{} {})), y)

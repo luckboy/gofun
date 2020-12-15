@@ -23,12 +23,14 @@
 package gofun
 import "fmt"
 
+// List represents value lists from functional languages.
 type List struct {
     isCons bool
     head interface{}
     tail *List
 }
 
+// ListOrElse returns x if x is List pointer, otherwise y.
 func ListOrElse(x interface{}, y *List) *List {
     z, isOk := x.(*List)
     if isOk {
@@ -38,26 +40,32 @@ func ListOrElse(x interface{}, y *List) *List {
     }
 }
 
+// Nil creates an empty list.
 func Nil() *List {
     return &List { isCons: false, head: nil, tail: nil }
 }
 
+// Cons creates a list with a first element and a tail that is other list.
 func Cons(head interface{}, tail *List) *List {
     return &List { isCons: true, head: head, tail: tail }
 }
 
+// IsNil returns true if list is empty, otherwise false.
 func (l *List) IsNil() bool {
     return !l.isCons
 }
 
+// IsCons returns true if list isn't empty, otherwise false.
 func (l *List) IsCons() bool {
     return l.isCons
 }
 
+// Head returns the first element.
 func (l *List) Head() interface{} {
     return l.head
 }
 
+// HeadOption returns the optional first element.
 func (l *List) HeadOption() *Option {
     if l.isCons {
         return Some(l.head)
@@ -66,10 +74,12 @@ func (l *List) HeadOption() *Option {
     }
 }
 
+// Tail returns a list of elements except the first element.
 func (l *List) Tail() *List {
     return l.tail
 }
 
+// Tail returns an optional list of elements except the first element.
 func (l *List) TailOption() *Option {
     if l.isCons {
         return Some(l.tail)
@@ -78,6 +88,8 @@ func (l *List) TailOption() *Option {
     }
 }
 
+// SetTail sets a tail if a list isn't empty. If SetTail can set the tail, this method returns true;
+// otherwise this method returns false. This method should be used to quick creates lists.
 func (l *List) SetTail(tail *List) bool {
     if l.isCons {
         l.tail = tail
@@ -101,6 +113,7 @@ func (l *List) String() string {
     return s
 }
 
+// Concat concatenates two lists.
 func (xs *List) Concat(ys *List) *List {
     var zs *List = Nil()
     var prev *List = nil

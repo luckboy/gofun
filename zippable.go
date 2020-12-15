@@ -22,7 +22,10 @@
 
 package gofun
 
+// Zippable is the interface for zipping. 
 type Zippable interface {
+    // Zip creates Unzippable of pairs where two elements from two Zippables
+    // have same position. Fail must be a failure Unzippable.
     Zip(ys Zippable, fail Unzippable) Unzippable
 }
 
