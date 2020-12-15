@@ -24,7 +24,8 @@ package gofun
 
 // Unzippable is the interface for unzipping.
 type Unzippable interface {
-    // Unzip is zipping inverse. Fail must be a failure Zippable.
+    // Unzip creates two Zippables where two elements from two Zippables are
+    // contained the pair from Unzippable. Fail must be a failure Zippable.
     Unzip(fail Zippable) (Zippable, Zippable)
 }
 

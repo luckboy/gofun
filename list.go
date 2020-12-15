@@ -23,7 +23,7 @@
 package gofun
 import "fmt"
 
-// List represents value lists from functional languages.
+// List represents value lists.
 type List struct {
     isCons bool
     head interface{}

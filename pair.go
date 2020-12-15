@@ -23,7 +23,7 @@
 package gofun
 import "fmt"
 
-// Pair represents pair.
+// Pair represents value pairs.
 type Pair struct {
     First interface{}
     Second interface{}
