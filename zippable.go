@@ -30,6 +30,7 @@ type Zippable interface {
     Zip(ys Zippable, fail Unzippable) Unzippable
 }
 
+// ZippableOrElse returns x if x is Zippable, otherwise y.
 func ZippableOrElse(x interface{}, y Zippable) Zippable {
     z, isOk := x.(Zippable)
     if isOk {

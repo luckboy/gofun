@@ -29,6 +29,7 @@ type Unzippable interface {
     Unzip(fail Zippable) (Zippable, Zippable)
 }
 
+// UnzippableOrElse returns x if x is Unzippable, otherwise y.
 func UnzippableOrElse(x interface{}, y Unzippable) Unzippable {
     z, isOk := x.(Unzippable)
     if isOk {
