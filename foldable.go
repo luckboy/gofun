@@ -26,10 +26,10 @@ import "reflect"
 // Foldable is the interface for folding.
 type Foldable interface {
     // FoldLeft folds Foldable from left side. Left folding is 
-    // calculated f(...f(f(z, x[0]), x[1])..., x[n-1]).
+    // calculated f(...f(f(z, xs[0]), xs[1])..., xs[n-1]).
     FoldLeft(f func(interface{}, interface{}) interface{}, z interface{}) interface{}
     // FoldLeft folds Foldable from right side. Right folding is
-    // calculated f(x[0], f(x[1], ...f(x[n-1], z)...)).
+    // calculated f(xs[0], f(xs[1], ...f(xs[n-1], z)...)).
     FoldRight(f func(interface{}, interface{}) interface{}, z interface{}) interface{}
 }
 
