@@ -69,7 +69,7 @@ func Any(f func(interface{}) bool, xs Foldable) bool {
     }, false), false)
 }
 
-// AnyM is similar to All but returns Monad and f returns Monad instead of bool values. Unit must be
+// AnyM is similar to Any but returns Monad and f returns Monad instead of bool values. Unit must be
 // the unit function for specified monad.
 func AnyM(f func(interface{}) Monad, xs Foldable, unit func(interface{}) Monad) Monad {
     return FoldLeftM(func(x interface{}, y interface{}) Monad {
