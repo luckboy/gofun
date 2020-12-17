@@ -166,7 +166,7 @@ func FilterSliceM(f func(interface{}) Monad, xs Foldable, unit func(interface{})
     }, InterfaceSlice([]interface{} {}), xs, unit)
 }
 
-// Find finds the element.
+// Find finds the element and returns the optional found element.
 func Find(f func(interface{}) bool, xs Foldable) *Option {
     return OptionOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
             o := OptionOrElse(x, None())

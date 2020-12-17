@@ -74,12 +74,12 @@ func (l *List) HeadOption() *Option {
     }
 }
 
-// Tail returns a list of elements except the first element.
+// Tail returns the list of elements except the first element.
 func (l *List) Tail() *List {
     return l.tail
 }
 
-// Tail returns an optional list of elements except the first element.
+// TailOption returns the optional list of elements except the first element.
 func (l *List) TailOption() *Option {
     if l.isCons {
         return Some(l.tail)
