@@ -248,12 +248,12 @@ func Length(xs Foldable) int {
     }, 0), 0)
 }
 
-// NotDeepElement is a DeepElement negation.
+// NotDeepElement is the DeepElement negation.
 func NotDeepElement(x interface{}, xs Foldable) bool {
     return !DeepElement(x, xs)
 }
 
-// NotElement is an Element negation.
+// NotElement is the Element negation.
 func NotElement(x interface{}, xs Foldable) bool {
     return !Element(x, xs)
 }
