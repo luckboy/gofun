@@ -49,12 +49,12 @@ func Right(x interface{}) *Either {
     return &Either { isRight: true, x: x }
 }
 
-// IsLeft returns true if e contains a left value, otherwise false.
+// IsLeft returns true if e contains the left value, otherwise false.
 func (e *Either) IsLeft() bool {
     return !e.isRight
 }
 
-// IsRight returns true if e contains a right value, otherwise false.
+// IsRight returns true if e contains the right value, otherwise false.
 func (e *Either) IsRight() bool {
     return e.isRight
 }
@@ -104,7 +104,7 @@ func (e *Either) GetRightOrElse(x func() interface{}) interface{} {
     }
 }
 
-// RightOrElse returns e if e contains a right value, otherwise e2().
+// RightOrElse returns e if e contains the right value, otherwise e2().
 func (e *Either) RightOrElse(e2 func() *Either) interface{} {
     if e.isRight {
         return e

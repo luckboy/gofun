@@ -49,12 +49,12 @@ func Some(x interface{}) *Option {
     return &Option { isSome: true, x: x }
 }
 
-// IsNone returns true if o doesn't contain a value, otherwise false.
+// IsNone returns true if o doesn't contain the value, otherwise false.
 func (o *Option) IsNone() bool {
     return !o.isSome
 }
 
-// IsNone returns true if o contains a value, otherwise false.
+// IsNone returns true if o contains the value, otherwise false.
 func (o *Option) IsSome() bool {
     return o.isSome
 }
@@ -73,7 +73,7 @@ func (o *Option) GetOrElse(x func() interface{}) interface{} {
     }
 }
 
-// OrElse returns o if o contains a value, otherwise o2().
+// OrElse returns o if o contains the value, otherwise o2().
 func (o *Option) OrElse(o2 func() *Option) *Option {
     if o.isSome {
         return o
