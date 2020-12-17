@@ -241,7 +241,7 @@ func FoldRightM(f func(interface{}, interface{}) Monad, z interface{}, xs Foldab
     }
 }
 
-// Length returns the length of Folable.
+// Length returns the length of Foldable.
 func Length(xs Foldable) int {
     return IntOrElse(xs.FoldLeft(func(x, y interface{}) interface{} {
             return IntOrElse(x, 0) + 1

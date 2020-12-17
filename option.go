@@ -64,7 +64,7 @@ func (o *Option) Get() interface{} {
     return o.x
 }
 
-// GetOrElse returns a value if o contains the value, otherwise x().
+// GetOrElse returns the value if o contains the value, otherwise x().
 func (o *Option) GetOrElse(x func() interface{}) interface{} {
     if o.isSome {
         return o.x

@@ -77,7 +77,7 @@ func (e *Either) GetRight() interface{} {
     }
 }
 
-// GetLeftOrElse returns a left value if e contains the left value, otherwise x().
+// GetLeftOrElse returns the left value if e contains the left value, otherwise x().
 func (e *Either) GetLeftOrElse(x func() interface{}) interface{} {
     if e.isRight {
         return x()
@@ -95,7 +95,7 @@ func (e *Either) LeftOrElse(e2 func() *Either) interface{} {
     }
 }
 
-// GetRightOrElse returns a right value if e contains the right value, otherwise x().
+// GetRightOrElse returns the right value if e contains the right value, otherwise x().
 func (e *Either) GetRightOrElse(x func() interface{}) interface{} {
     if e.isRight {
         return e.x
