@@ -59,7 +59,7 @@ func (o *Option) IsSome() bool {
     return o.isSome
 }
 
-// Get returns a value.
+// Get returns the value.
 func (o *Option) Get() interface{} {
     return o.x
 }

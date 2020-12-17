@@ -59,7 +59,7 @@ func (e *Either) IsRight() bool {
     return e.isRight
 }
 
-// GetLeft returns a left value.
+// GetLeft returns the left value.
 func (e *Either) GetLeft() interface{} {
     if e.isRight {
         return nil
@@ -68,7 +68,7 @@ func (e *Either) GetLeft() interface{} {
     }
 }
 
-// GetRight returns a right value.
+// GetRight returns the right value.
 func (e *Either) GetRight() interface{} {
     if e.isRight {
         return e.x
