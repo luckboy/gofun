@@ -54,7 +54,7 @@ func (o *Option) IsNone() bool {
     return !o.isSome
 }
 
-// IsNone returns true if o contains the value, otherwise false.
+// IsSome returns true if o contains the value, otherwise false.
 func (o *Option) IsSome() bool {
     return o.isSome
 }
