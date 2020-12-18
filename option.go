@@ -39,12 +39,12 @@ func OptionOrElse(x interface{}, y *Option) *Option {
     }
 }
 
-// None creates a Option without a value.
+// None creates an Option without a value.
 func None() *Option {
     return &Option { isSome: false, x: nil } 
 }
 
-// Some creates a Option with a value.
+// Some creates an Option with a value.
 func Some(x interface{}) *Option {
     return &Option { isSome: true, x: x }
 }
