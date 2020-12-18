@@ -88,7 +88,7 @@ func (l *List) TailOption() *Option {
     }
 }
 
-// SetTail sets a tail if a list isn't empty. If SetTail can set the tail, this method returns true;
+// SetTail sets a tail if the list isn't empty. If SetTail sets the tail, this method returns true;
 // otherwise this method returns false. This method should be used to quick creates lists.
 func (l *List) SetTail(tail *List) bool {
     if l.isCons {
